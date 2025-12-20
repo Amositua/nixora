@@ -31,7 +31,10 @@ export default function SignIn({ setCurrentScreen, onAuthSuccess }) {
 
     try {
       const session = await authService.login(email, password);
-
+      console.log("Login successful:", session);
+      // if (rememberMe) {
+      //   authService.saveSession(session);
+      // }
       onAuthSuccess(session);
     } catch (err) {
       

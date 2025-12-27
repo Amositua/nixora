@@ -1,296 +1,245 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { Filter, Download, Eye, ChevronDown, ArrowUpDown } from 'lucide-react';
-import Button from '../components/ui/Button';
-import Badge from '../components/ui/Badge';
+import { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/Card";
+// import { Eye } from "lucide-react";
+import Button from "../components/ui/Button";
+import Badge from "../components/ui/Badge";
 
-export default function Portfolio() {
-  const [sortField, setSortField] = useState('loanName');
-  const [sortDirection, setSortDirection] = useState('asc');
+export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const loans = [
-    {
-      id: 1,
-      loanName: 'ABC Corp Senior Credit Facility',
-      borrower: 'ABC Corporation Limited',
-      principal: 500000000,
-      currency: 'USD',
-      benchmark: 'SOFR',
-      margin: 2.75,
-      maturityDate: '2029-12-31',
-      transferEligible: true,
-      consentRequired: false,
-    },
-    {
-      id: 2,
-      loanName: 'XYZ Limited Term Loan B',
-      borrower: 'XYZ Limited',
-      principal: 350000000,
-      currency: 'USD',
-      benchmark: 'SOFR',
-      margin: 3.25,
-      maturityDate: '2028-06-30',
-      transferEligible: true,
-      consentRequired: true,
-    },
-    {
-      id: 3,
-      loanName: 'Global Ventures RCF',
-      borrower: 'Global Ventures PLC',
-      principal: 200000000,
-      currency: 'GBP',
-      benchmark: 'SONIA',
-      margin: 2.50,
-      maturityDate: '2027-03-15',
-      transferEligible: true,
-      consentRequired: false,
-    },
-    {
-      id: 4,
-      loanName: 'TechStart Acquisition Facility',
-      borrower: 'TechStart Inc',
-      principal: 450000000,
-      currency: 'USD',
-      benchmark: 'SOFR',
-      margin: 4.00,
-      maturityDate: '2026-03-18',
-      transferEligible: false,
-      consentRequired: true,
-    },
-    {
-      id: 5,
-      loanName: 'Manufacturing Bridge Loan',
-      borrower: 'Industrial Manufacturing Co',
-      principal: 125000000,
-      currency: 'EUR',
-      benchmark: 'EURIBOR',
-      margin: 3.50,
-      maturityDate: '2026-09-30',
-      transferEligible: true,
-      consentRequired: false,
-    },
-    {
-      id: 6,
-      loanName: 'Real Estate Development Credit',
-      borrower: 'Property Developers Ltd',
-      principal: 280000000,
-      currency: 'USD',
-      benchmark: 'SOFR',
-      margin: 3.75,
-      maturityDate: '2030-12-31',
-      transferEligible: true,
-      consentRequired: true,
-    },
-    {
-      id: 7,
-      loanName: 'Energy Sector Term Facility',
-      borrower: 'Green Energy Solutions',
-      principal: 600000000,
-      currency: 'USD',
-      benchmark: 'SOFR',
-      margin: 2.25,
-      maturityDate: '2031-06-15',
-      transferEligible: true,
-      consentRequired: false,
-    },
-    {
-      id: 8,
-      loanName: 'Healthcare Acquisition Loan',
-      borrower: 'MedTech Holdings',
-      principal: 175000000,
-      currency: 'USD',
-      benchmark: 'SOFR',
-      margin: 3.00,
-      maturityDate: '2027-11-30',
-      transferEligible: false,
-      consentRequired: true,
-    },
-  ];
+  useEffect(() => {
+    const fetchLoans = async () => {
+      const user = localStorage.getItem("user");
+      const userId = user ? JSON.parse(user).userId : "guest";
+      const cachedLoans = localStorage.getItem(`loanDocuments:${userId}`);
 
-  const formatCurrency = (amount, currency) => {
-    const formatted = (amount / 1000000).toFixed(1);
-    return `${currency} ${formatted}M`;
-  };
+      if (cachedLoans) {
+        setDocuments(JSON.parse(cachedLoans));
+        setLoading(false);
+        return;
+      }
+      try {
+        const token = localStorage.getItem("accessToken");
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
+        const res = await fetch(
+          "https://nixora-image-latest.onrender.com/api/loans/documents/getAllLoan",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-  const getDaysToMaturity = (dateString) => {
-    const today = new Date();
-    const maturity = new Date(dateString);
-    const days = Math.floor((maturity - today) / (1000 * 60 * 60 * 24));
-    return days;
+        const data = await res.json();
+        console.log("loan data:", data);
+
+        const normalized = data.map((doc) => {
+          const parties = doc.loanData?.parties || {};
+          // const facility = doc.loanData?.facility || {};
+          // const pricing = doc.loanData?.interestPricing || {};
+           const interest = doc.loanData?.interest || {};
+
+          return {
+            id: doc.loanId,
+            borrower: parties.borrower || "-",
+            lender: parties.lenders[0] || "-",
+            facilityAgent: parties.facilityAgent || "-",
+            arranger: parties.arranger || "-",
+            guarantor: parties.guarantor || "-",
+
+            // facilityId: facility[0]?.facilityId || "-",
+            // facilityType: facility[0].facilityType || "-",
+            // facilityName: facility[0].facilityName || "-",
+            // currency: facility[0].currency || "-",
+            // facilityAmount: facility[0].facilityAmount || "-",
+            // availabilityPeriod: facility[0].availabilityPeriod || "-",
+            benchmark: interest.benchmark || "-",
+            // status: doc.status,
+          };
+        });
+
+        setDocuments(normalized);
+        const user = localStorage.getItem("user");
+        const userId = user ? JSON.parse(user).userId : "guest";
+        const STORAGE_KEY = `loanDocuments:${userId}`;
+        // console.log("Storing recent uploads under key:", STORAGE_KEY);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+      } catch (err) {
+        console.error("Failed to fetch portfolio", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLoans();
+  }, []);
+
+  const prefetchLoanDetails = async (loanId) => {
+    if (!loanId) return;
+
+    const user = localStorage.getItem("user");
+    const userId = user ? JSON.parse(user).userId : "guest";
+    const CACHE_KEY = `loanDetail:${userId}:${loanId}`;
+
+    // ✅ Do not refetch if already cached
+    if (localStorage.getItem(CACHE_KEY)) return;
+
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      const res = await fetch(
+        `https://nixora-image-latest.onrender.com/api/loans/documents/getLoan/${loanId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+      localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+    } catch (err) {
+      console.warn("Prefetch failed for loan:", loanId);
+      console.error(err);
+    }
   };
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Loan Portfolio</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage and track your loan portfolio</p>
-        </div>
-        <div className="flex space-x-3">
-          <Button variant="outline">
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
-          <Button variant="primary">
-            Add Loan
-          </Button>
-        </div>
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900">Loan Portfolio</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Extracted loan agreements and counterparties
+        </p>
       </div>
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">Show:</span>
-                <select className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option>All Loans</option>
-                  <option>Transfer Eligible</option>
-                  <option>Maturing Soon</option>
-                  <option>High Risk</option>
-                </select>
-              </div>
-              <div className="h-6 w-px bg-gray-300"></div>
-              <Button variant="outline" size="sm">
-                <Filter className="w-4 h-4 mr-2" />
-                Filters
-              </Button>
-            </div>
-            <div className="text-sm text-gray-600">
-              Showing <span className="font-medium text-gray-900">{loans.length}</span> loans
-            </div>
-          </div>
+          <CardTitle>Loans</CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-y border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left">
-                    <button className="flex items-center space-x-1 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700">
-                      <span>Loan Name</span>
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left">
-                    <button className="flex items-center space-x-1 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700">
-                      <span>Borrower</span>
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left">
-                    <button className="flex items-center space-x-1 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700">
-                      <span>Principal</span>
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left">
-                    <button className="flex items-center space-x-1 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700">
-                      <span>Benchmark</span>
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left">
-                    <button className="flex items-center space-x-1 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700">
-                      <span>Margin</span>
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left">
-                    <button className="flex items-center space-x-1 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700">
-                      <span>Maturity</span>
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left">
-                    <button className="flex items-center space-x-1 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700">
-                      <span>Transfer</span>
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {loans.map((loan) => {
-                  const daysToMaturity = getDaysToMaturity(loan.maturityDate);
-                  const isMaturingSoon = daysToMaturity < 365;
 
-                  return (
-                    <tr key={loan.id} className="hover:bg-gray-50 transition-colors cursor-pointer">
-                      <td className="px-6 py-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{loan.loanName}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">ID: LN-{loan.id.toString().padStart(6, '0')}</p>
-                        </div>
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="flex justify-center py-16">
+              <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                {/* ✅ NEW HEADERS */}
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    {[
+                      // "Document ID",
+                      "Borrower",
+                      "Lender",
+                      "Facility Agent",
+                      "arranger",
+                      "guarantor",
+                      "Benchmark",
+                      "Actions",
+                      // "Status",
+                      // "Actions",
+                    ].map((h) => (
+                      <th
+                        key={h}
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+
+                {/* ✅ REAL DATA */}
+                <tbody className="divide-y">
+                  {documents.map((doc) => (
+                    <tr
+                      key={doc.id}
+                      onMouseEnter={() => prefetchLoanDetails(doc.id)} // 👈 PREFETCH
+                      // onClick={() => {
+                      //   setSelectedLoanId(doc.id);
+                      //   setCurrentScreen("loan-details");
+                      // }}
+                      className="hover:bg-gray-50"
+                    >
+                      {/* <td className="px-4 py-3 text-sm font-mono text-gray-700">
+                        {doc.id.slice(0, 8)}…
+                      </td> */}
+                      <td className="px-4 py-3">{doc.borrower}</td>
+                      <td className="px-4 py-3">{doc.lender}</td>
+                      <td className="px-4 py-3">{doc.facilityAgent}</td>
+                      <td className="px-4 py-3">{doc.arranger}</td>
+                      <td className="px-4 py-3">{doc.guarantor}</td>
+                      <td className="px-4 py-3">
+                        <Badge variant="info">{doc.benchmark}</Badge>
                       </td>
-                      <td className="px-6 py-4">
-                        <p className="text-sm text-gray-900">{loan.borrower}</p>
+                      {/* <td className="px-4 py-3">{doc.facilityType}</td>
+                      <td className="px-4 py-3">{doc.facilityName}</td>
+                      <td className="px-4 py-3">{doc.facilityAmount}</td>
+                      <td className="px-4 py-3">{doc.currency}</td> */}
+
+                      {/* ✅ ACTION COLUMN */}
+                      <td className="px-4 py-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedLoanId(doc.id);
+                            setCurrentScreen("loan-details");
+                          }}
+                        >
+                          More Details
+                        </Button>
                       </td>
-                      <td className="px-6 py-4">
-                        <p className="text-sm font-medium text-gray-900">
-                          {formatCurrency(loan.principal, loan.currency)}
-                        </p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge variant="info">{loan.benchmark}</Badge>
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="text-sm text-gray-900">{loan.margin}%</p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div>
-                          <p className="text-sm text-gray-900">{formatDate(loan.maturityDate)}</p>
-                          {isMaturingSoon && (
-                            <p className="text-xs text-yellow-600 font-medium mt-0.5">
-                              {daysToMaturity} days
-                            </p>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {loan.transferEligible ? (
-                          <div>
-                            <Badge variant="success">Eligible</Badge>
-                            {loan.consentRequired && (
-                              <p className="text-xs text-gray-500 mt-1">Consent Required</p>
-                            )}
-                          </div>
-                        ) : (
-                          <Badge variant="error">Restricted</Badge>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
+                      {/* <td className="px-4 py-3">
+                        <Badge
+                          variant={
+                            doc.status === "TEXT_EXTRACTED"
+                              ? "success"
+                              : "processing"
+                          }
+                        >
+                          {doc.status}
+                        </Badge>
+                      </td> */}
+                      {/* <td className="px-4 py-3">
                         <Button variant="outline" size="sm">
                           <Eye className="w-3 h-3 mr-1" />
                           View
                         </Button>
-                      </td>
+                      </td> */}
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">
-          Showing 1 to {loans.length} of {loans.length} results
+          Showing 1 to {documents.length} of {documents.length} results
         </p>
         <div className="flex space-x-2">
           <Button variant="outline" size="sm" disabled>
             Previous
           </Button>
-          <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600 border-blue-200">
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-blue-50 text-blue-600 border-blue-200"
+          >
             1
           </Button>
           <Button variant="outline" size="sm" disabled>

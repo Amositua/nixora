@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { User, Lock, Bell, Database, FileText, Globe } from 'lucide-react';
 import Button from '../components/ui/Button';
 
+const user = localStorage.getItem('user')
+
 export default function Settings() {
   return (
     <div className="p-6 space-y-6">
@@ -32,7 +34,7 @@ export default function Settings() {
                   </label>
                   <input
                     type="text"
-                    defaultValue="John"
+                    defaultValue={user ? JSON.parse(user).name.split(" ")[0] : "John"}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -42,7 +44,7 @@ export default function Settings() {
                   </label>
                   <input
                     type="text"
-                    defaultValue="Davis"
+                    defaultValue={user ? JSON.parse(user).name.split(" ")[1] : "Davis"}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -53,7 +55,7 @@ export default function Settings() {
                 </label>
                 <input
                   type="email"
-                  defaultValue="john.davis@example.com"
+                  defaultValue={user ? JSON.parse(user).sub : "john.davis@example.com"}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>

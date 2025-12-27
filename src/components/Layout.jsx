@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Upload,
@@ -10,20 +10,37 @@ import {
   Settings,
   ChevronDown,
   Menu,
-  LogOut
-} from 'lucide-react';
+  LogOut,
+} from "lucide-react";
 
-export default function Layout({ currentScreen, setCurrentScreen, children, onSignOut }) {
+// const user = localStorage.getItem("user");
+// console.log("Layout user:", user);
+
+export default function Layout({
+  currentScreen,
+  setCurrentScreen,
+  children,
+  onSignOut,
+}) {
+  const [user, setUser] = useState(null);
+  console.log("Layout render, user:", user);
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(userData);
+    }
+  }, []);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'upload', label: 'Upload Loans', icon: Upload },
-    { id: 'portfolio', label: 'Loan Portfolio', icon: FolderOpen },
-    { id: 'query', label: 'Search & Queries', icon: Search },
-    { id: 'reports', label: 'Reports', icon: FileText },
-    { id: 'timeline', label: 'Loan Timelines', icon: Calendar },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "upload", label: "Upload Loans", icon: Upload },
+    { id: "portfolio", label: "Loan Portfolio", icon: FolderOpen },
+    { id: "query", label: "Search & Queries", icon: Search },
+    { id: "reports", label: "Reports", icon: FileText },
+    { id: "timeline", label: "Loan Timelines", icon: Calendar },
+    { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   return (
@@ -34,7 +51,7 @@ export default function Layout({ currentScreen, setCurrentScreen, children, onSi
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-teal-500 rounded-lg flex items-center justify-center">
               <FileText className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-semibold text-gray-900">LoanHub</span>
+            <span className="text-lg font-semibold text-gray-900">Nixora</span>
           </div>
         </div>
 
@@ -48,11 +65,15 @@ export default function Layout({ currentScreen, setCurrentScreen, children, onSi
                 onClick={() => setCurrentScreen(item.id)}
                 className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors ${
                   isActive
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`} />
+                <Icon
+                  className={`w-5 h-5 ${
+                    isActive ? "text-blue-700" : "text-gray-500"
+                  }`}
+                />
                 <span className="text-sm font-medium">{item.label}</span>
               </button>
             );
@@ -65,20 +86,39 @@ export default function Layout({ currentScreen, setCurrentScreen, children, onSi
             className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-teal-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-              JD
+              {user
+                ? JSON.parse(user)
+                    .name.split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()
+                : "JD"}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">John Davis</p>
-              <p className="text-xs text-gray-500 truncate">Portfolio Manager</p>
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user
+                  ? JSON.parse(user)
+                      .name.split(" ")
+                      .map((n) => n.charAt(0).toUpperCase() + n.slice(1))
+                      .join(" ")
+                  : "John Davis"}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                Portfolio Manager
+              </p>
             </div>
-            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              className={`w-4 h-4 text-gray-400 transition-transform ${
+                showUserMenu ? "rotate-180" : ""
+              }`}
+            />
           </button>
 
           {showUserMenu && (
             <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden z-50">
               <button
                 onClick={() => {
-                  setCurrentScreen('settings');
+                  setCurrentScreen("settings");
                   setShowUserMenu(false);
                 }}
                 className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-200"
@@ -123,14 +163,18 @@ export default function Layout({ currentScreen, setCurrentScreen, children, onSi
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-teal-600 rounded-full flex items-center justify-center text-white text-sm font-medium cursor-pointer">
-              JD
+              {user
+                ? JSON.parse(user)
+                    .name.split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()
+                : "JD"}
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

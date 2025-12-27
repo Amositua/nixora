@@ -88,6 +88,7 @@ export default function SignIn({ setCurrentScreen, onAuthSuccess }) {
               </label>
               <input
                 type="email"
+                id="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"

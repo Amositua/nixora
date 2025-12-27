@@ -1,47 +1,62 @@
-import { FileText, BarChart3, Search, Calendar, Shield, Zap, ArrowRight, CheckCircle } from 'lucide-react';
-import Button from '../components/ui/Button';
+import {
+  FileText,
+  BarChart3,
+  Search,
+  Calendar,
+  Shield,
+  Zap,
+  ArrowRight,
+  CheckCircle,
+} from "lucide-react";
+import Button from "../components/ui/Button";
 
 export default function Landing({ setCurrentScreen }) {
   const features = [
     {
       icon: FileText,
-      title: 'Document Processing',
-      description: 'Convert loan agreements into structured digital data aligned with LMA standards',
+      title: "Document Processing",
+      description:
+        "Convert loan agreements into structured digital data aligned with LMA standards",
     },
     {
       icon: BarChart3,
-      title: 'Portfolio Analytics',
-      description: 'Comprehensive analysis and reporting across your entire loan portfolio',
+      title: "Portfolio Analytics",
+      description:
+        "Comprehensive analysis and reporting across your entire loan portfolio",
     },
     {
       icon: Search,
-      title: 'Advanced Search',
-      description: 'Natural language queries and powerful filters to find exactly what you need',
+      title: "Advanced Search",
+      description:
+        "Natural language queries and powerful filters to find exactly what you need",
     },
     {
       icon: Calendar,
-      title: 'Timeline Management',
-      description: 'Track important dates, deadlines, and events with calendar integration',
+      title: "Timeline Management",
+      description:
+        "Track important dates, deadlines, and events with calendar integration",
     },
     {
       icon: Shield,
-      title: 'Enterprise Security',
-      description: 'Bank-grade security with role-based access and comprehensive audit trails',
+      title: "Enterprise Security",
+      description:
+        "Bank-grade security with role-based access and comprehensive audit trails",
     },
     {
       icon: Zap,
-      title: 'Real-Time Alerts',
-      description: 'Stay informed with customizable notifications for critical events',
+      title: "Real-Time Alerts",
+      description:
+        "Stay informed with customizable notifications for critical events",
     },
   ];
 
   const benefits = [
-    'Automate loan document processing and data extraction',
-    'Reduce manual work by up to 80% on document review',
-    'Achieve full transparency across your loan portfolio',
-    'Make faster, data-driven decisions with advanced analytics',
-    'Ensure compliance with LMA standards and regulations',
-    'Seamlessly integrate with your existing workflows',
+    "Automate loan document processing and data extraction",
+    "Reduce manual work by up to 80% on document review",
+    "Achieve full transparency across your loan portfolio",
+    "Make faster, data-driven decisions with advanced analytics",
+    "Ensure compliance with LMA standards and regulations",
+    "Seamlessly integrate with your existing workflows",
   ];
 
   return (
@@ -52,7 +67,7 @@ export default function Landing({ setCurrentScreen }) {
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-teal-500 rounded-lg flex items-center justify-center">
               <FileText className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-semibold text-gray-900">LoanHub</span>
+            <span className="text-lg font-semibold text-gray-900">Nixora</span>
           </div>
           <div className="flex items-center space-x-4">
             <button className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
@@ -65,10 +80,18 @@ export default function Landing({ setCurrentScreen }) {
               About
             </button>
             <div className="w-px h-6 bg-gray-200"></div>
-            <Button variant="outline" size="sm" onClick={() => setCurrentScreen('signin')}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentScreen("signin")}
+            >
               Sign In
             </Button>
-            <Button variant="primary" size="sm" onClick={() => setCurrentScreen('signup')}>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setCurrentScreen("signup")}
+            >
               Sign Up
             </Button>
           </div>
@@ -80,16 +103,25 @@ export default function Landing({ setCurrentScreen }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-block mb-4 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full">
-                <span className="text-sm font-medium text-blue-700">Digital Transformation</span>
+                <span className="text-sm font-medium text-blue-700">
+                  Digital Transformation
+                </span>
               </div>
               <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 leading-tight mb-6">
                 Digitize Your Loan Portfolio
               </h1>
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Convert loan documents into structured digital data, analyze your entire portfolio, and make faster decisions with LoanHub's enterprise-grade platform.
+                Convert loan documents into structured digital data, analyze
+                your entire portfolio, and make faster decisions with Nixora's
+                enterprise-grade platform.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="primary" size="lg" onClick={() => setCurrentScreen('signup')} className="flex items-center justify-center">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={() => setCurrentScreen("signup")}
+                  className="flex items-center justify-center"
+                >
                   Get Started Free
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
@@ -125,7 +157,8 @@ export default function Landing({ setCurrentScreen }) {
               Powerful Features Built for Lenders
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Everything you need to manage, analyze, and optimize your loan portfolio in one place.
+              Everything you need to manage, analyze, and optimize your loan
+              portfolio in one place.
             </p>
           </div>
 
@@ -156,7 +189,7 @@ export default function Landing({ setCurrentScreen }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                Why Choose LoanHub?
+                Why Choose Nixora?
               </h2>
               <div className="space-y-4">
                 {benefits.map((benefit, index) => (
@@ -196,10 +229,16 @@ export default function Landing({ setCurrentScreen }) {
               Ready to Transform Your Loan Management?
             </h2>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Join leading financial institutions that are digitizing their loan portfolios with LoanHub.
+              Join leading financial institutions that are digitizing their loan
+              portfolios with Nixora.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="primary" size="lg" onClick={() => setCurrentScreen('signup')} className="flex items-center justify-center">
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={() => setCurrentScreen("signup")}
+                className="flex items-center justify-center"
+              >
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -218,45 +257,97 @@ export default function Landing({ setCurrentScreen }) {
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-teal-500 rounded-lg flex items-center justify-center">
                     <FileText className="w-5 h-5 text-white" />
                   </div>
-                  <span className="font-semibold text-gray-900">LoanHub</span>
+                  <span className="font-semibold text-gray-900">Nixora</span>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Enterprise loan management platform for financial professionals.
+                  Enterprise loan management platform for financial
+                  professionals.
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4">Product</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li><a href="#" className="hover:text-gray-900">Features</a></li>
-                  <li><a href="#" className="hover:text-gray-900">Pricing</a></li>
-                  <li><a href="#" className="hover:text-gray-900">Security</a></li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900">
+                      Features
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900">
+                      Pricing
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900">
+                      Security
+                    </a>
+                  </li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4">Company</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li><a href="#" className="hover:text-gray-900">About</a></li>
-                  <li><a href="#" className="hover:text-gray-900">Blog</a></li>
-                  <li><a href="#" className="hover:text-gray-900">Contact</a></li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900">
+                      About
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900">
+                      Blog
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900">
+                      Contact
+                    </a>
+                  </li>
                 </ul>
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4">Legal</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li><a href="#" className="hover:text-gray-900">Privacy</a></li>
-                  <li><a href="#" className="hover:text-gray-900">Terms</a></li>
-                  <li><a href="#" className="hover:text-gray-900">Compliance</a></li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900">
+                      Privacy
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900">
+                      Terms
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900">
+                      Compliance
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>
             <div className="border-t border-gray-200 pt-8 flex items-center justify-between">
               <p className="text-sm text-gray-600">
-                © 2025 LoanHub. All rights reserved.
+                © 2025 Nixora. All rights reserved.
               </p>
               <div className="flex items-center space-x-6">
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Twitter</a>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">LinkedIn</a>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">GitHub</a>
+                <a
+                  href="#"
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Twitter
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  LinkedIn
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  GitHub
+                </a>
               </div>
             </div>
           </div>

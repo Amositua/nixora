@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   FileText,
   ArrowLeft,
@@ -7,37 +7,37 @@ import {
   AlertCircle,
   CheckCircle,
   Loader,
-} from 'lucide-react';
-import Button from '../components/ui/Button';
-import { authService } from '../services/authServices';
+} from "lucide-react";
+import Button from "../components/ui/Button";
+import { authService } from "../services/authServices";
 
 export default function SignUp({ setCurrentScreen }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [company, setCompany] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [company, setCompany] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const validateForm = () => {
     if (!fullName.trim()) {
-      setError('Full name is required');
+      setError("Full name is required");
       return false;
     }
-    if (!email.includes('@')) {
-      setError('Please enter a valid email address');
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address");
       return false;
     }
     if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError("Password must be at least 8 characters");
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return false;
     }
     return true;
@@ -45,7 +45,7 @@ export default function SignUp({ setCurrentScreen }) {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!validateForm()) return;
 
@@ -59,13 +59,13 @@ export default function SignUp({ setCurrentScreen }) {
 
       // ✅ Redirect to sign-in after successful signup
       setTimeout(() => {
-        setCurrentScreen('signin');
+        setCurrentScreen("signin");
       }, 2000);
     } catch (err) {
       const message =
         err.response?.data?.message ||
         err.message ||
-        'Signup failed. Please try again.';
+        "Signup failed. Please try again.";
 
       setError(message);
     } finally {
@@ -77,7 +77,7 @@ export default function SignUp({ setCurrentScreen }) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <button
-          onClick={() => setCurrentScreen('landing')}
+          onClick={() => setCurrentScreen("landing")}
           className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -95,7 +95,7 @@ export default function SignUp({ setCurrentScreen }) {
             Create Account
           </h1>
           <p className="text-gray-600 text-center mb-8">
-            Join LoanHub to manage your loan portfolio
+            Join Nixora to manage your loan portfolio
           </p>
 
           {error && (
@@ -163,15 +163,15 @@ export default function SignUp({ setCurrentScreen }) {
                   Creating Account...
                 </>
               ) : (
-                'Create Account'
+                "Create Account"
               )}
             </Button>
           </form>
 
           <p className="text-center text-sm text-gray-600 mt-6">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <button
-              onClick={() => setCurrentScreen('signin')}
+              onClick={() => setCurrentScreen("signin")}
               className="text-blue-600 font-medium"
             >
               Sign In

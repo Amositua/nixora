@@ -1,42 +1,46 @@
-import { useState, useEffect } from 'react';
-import Layout from './components/Layout';
-import Dashboard from './screens/Dashboard';
-import Upload from './screens/Upload';
-import LoanReview from './screens/LoanReview';
-import Portfolio from './screens/Portfolio';
-import QueryBuilder from './screens/QueryBuilder';
-import Reports from './screens/Reports';
-import Timeline from './screens/Timeline';
-import Notifications from './screens/Notifications';
-import Settings from './screens/Settings';
-import Landing from './screens/Landing';
-import SignIn from './screens/SignIn';
-import SignUp from './screens/SignUp';
-import { authService } from './services/authServices';
+import { useState, useEffect } from "react";
+import Layout from "./components/Layout";
+import Dashboard from "./screens/Dashboard";
+import Upload from "./screens/Upload";
+import LoanReview from "./screens/LoanReview";
+import Portfolio from "./screens/Portfolio";
+import QueryBuilder from "./screens/QueryBuilder";
+import Reports from "./screens/Reports";
+import Timeline from "./screens/Timeline";
+import Notifications from "./screens/Notifications";
+import Settings from "./screens/Settings";
+import Landing from "./screens/Landing";
+import SignIn from "./screens/SignIn";
+import SignUp from "./screens/SignUp";
+import { authService } from "./services/authServices";
+
+import LoanDetails from "./screens/LoanDetails"
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState('landing');
+  const [currentScreen, setCurrentScreen] = useState("landing");
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [selectedLoanId, setSelectedLoanId] = useState(null);
 
   useEffect(() => {
     const session = authService.getSession();
 
     if (session) {
       setSession(session);
-      setCurrentScreen('dashboard');
+      setCurrentScreen("dashboard");
     }
 
-    console.log('Auth session checked:', session);
-    console.log('Current Screen on load:', currentScreen);
-    
+    console.log("Auth session checkeddddd:", session);
+    // console.log("Current Screen on load:", currentScreen);
+
     setLoading(false);
   }, []);
 
   const handleSignOut = () => {
     authService.logout();
     setSession(null);
-    setCurrentScreen('landing');
+    setCurrentScreen("landing");
   };
 
   if (loading) {
@@ -50,46 +54,65 @@ function App() {
   if (!session) {
     return (
       <>
-        {currentScreen === 'landing' && (
+        {currentScreen === "landing" && (
           <Landing setCurrentScreen={setCurrentScreen} />
         )}
-        {currentScreen === 'signin' && (
+        {currentScreen === "signin" && (
           <SignIn
             setCurrentScreen={setCurrentScreen}
             onAuthSuccess={(session) => {
               setSession(session);
-              setCurrentScreen('dashboard');
+              setCurrentScreen("dashboard");
             }}
           />
         )}
-        {currentScreen === 'signup' && (
+        {currentScreen === "signup" && (
           <SignUp setCurrentScreen={setCurrentScreen} />
         )}
       </>
     );
   }
 
-  console.log('currentScreen inside session:', currentScreen);
+  console.log("currentScreen inside session:", currentScreen);
 
   const renderScreen = () => {
     switch (currentScreen) {
-      case 'dashboard':
+      case "dashboard":
         return <Dashboard />;
-      case 'upload':
-        return <Upload />;
-      case 'review':
+      case "upload":
+        return (
+          <Upload
+            currentScreen={currentScreen}
+            setCurrentScreen={setCurrentScreen}
+            setSelectedLoanId={setSelectedLoanId}
+          />
+        );
+      case "review":
         return <LoanReview />;
-      case 'portfolio':
-        return <Portfolio />;
-      case 'query':
+      case "portfolio":
+        return (
+          <Portfolio
+            setCurrentScreen={setCurrentScreen}
+            setSelectedLoanId={setSelectedLoanId}
+          />
+        );
+      case "loan-details":
+        return (
+          <LoanDetails
+            loanId={selectedLoanId}
+            setCurrentScreen={setCurrentScreen}
+          />
+        );
+
+      case "query":
         return <QueryBuilder />;
-      case 'reports':
+      case "reports":
         return <Reports />;
-      case 'timeline':
+      case "timeline":
         return <Timeline />;
-      case 'notifications':
+      case "notifications":
         return <Notifications />;
-      case 'settings':
+      case "settings":
         return <Settings />;
       default:
         return <Dashboard />;

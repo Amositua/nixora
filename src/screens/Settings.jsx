@@ -4,7 +4,7 @@ import Button from '../components/ui/Button';
 
 const user = localStorage.getItem('user')
 
-export default function Settings() {
+export default function Settings({ setCurrentScreen }) {
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -275,6 +275,9 @@ export default function Settings() {
               </div>
               <Button variant="outline" className="w-full">
                 Manage Storage
+              </Button>
+              <Button onClick={() => setCurrentScreen("privacy")} variant="outline" className="w-full">
+                Privacy Policy
               </Button>
             </CardContent>
           </Card>

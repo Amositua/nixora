@@ -4,6 +4,7 @@ import Dashboard from "./screens/Dashboard";
 import Upload from "./screens/Upload";
 import LoanReview from "./screens/LoanReview";
 import Portfolio from "./screens/Portfolio";
+import LoanComparison from "./screens/LoanCompare";
 import QueryBuilder from "./screens/QueryBuilder";
 import Reports from "./screens/Reports";
 import Timeline from "./screens/Timeline";
@@ -12,9 +13,12 @@ import Settings from "./screens/Settings";
 import Landing from "./screens/Landing";
 import SignIn from "./screens/SignIn";
 import SignUp from "./screens/SignUp";
+import Policy from "./screens/Policy";
 import { authService } from "./services/authServices";
 
-import LoanDetails from "./screens/LoanDetails"
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+
+import LoanDetails from "./screens/LoanDetails";
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState("landing");
@@ -36,6 +40,17 @@ function App() {
 
     setLoading(false);
   }, []);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading) {
+      navigate(
+        currentScreen === "dashboard" ? "/dashboard" : `/${currentScreen}`,
+        { replace: true }
+      );
+    }
+  }, [currentScreen]);
 
   const handleSignOut = () => {
     authService.logout();
@@ -74,50 +89,64 @@ function App() {
   }
 
   console.log("currentScreen inside session:", currentScreen);
+  const user = localStorage.getItem("user");
+  const userId = user ? JSON.parse(user).userId : "guest";
+  const LoanData = localStorage.getItem(`loanDocuments:${userId}`);
 
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case "dashboard":
-        return <Dashboard />;
-      case "upload":
-        return (
-          <Upload
-            currentScreen={currentScreen}
-            setCurrentScreen={setCurrentScreen}
-            setSelectedLoanId={setSelectedLoanId}
-          />
-        );
-      case "review":
-        return <LoanReview />;
-      case "portfolio":
-        return (
-          <Portfolio
-            setCurrentScreen={setCurrentScreen}
-            setSelectedLoanId={setSelectedLoanId}
-          />
-        );
-      case "loan-details":
-        return (
-          <LoanDetails
-            loanId={selectedLoanId}
-            setCurrentScreen={setCurrentScreen}
-          />
-        );
+  // const renderScreen = () => {
+  //   switch (currentScreen) {
+  //     case "dashboard":
+  //       return <Dashboard />;
+  //     case "upload":
+  //       return (
+  //         <Upload
+  //           currentScreen={currentScreen}
+  //           setCurrentScreen={setCurrentScreen}
+  //           setSelectedLoanId={setSelectedLoanId}
+  //         />
+  //       );
+  //     case "review":
+  //       return <LoanReview />;
+  //     case "portfolio":
+  //       return (
+  //         <Portfolio
+  //           setCurrentScreen={setCurrentScreen}
+  //           setSelectedLoanId={setSelectedLoanId}
+  //         />
+  //       );
+  //     case "loan-details":
+  //       return (
+  //         <LoanDetails
+  //           loanId={selectedLoanId}
+  //           setCurrentScreen={setCurrentScreen}
+  //         />
+  //       );
 
-      case "query":
-        return <QueryBuilder />;
-      case "reports":
-        return <Reports />;
-      case "timeline":
-        return <Timeline />;
-      case "notifications":
-        return <Notifications />;
-      case "settings":
-        return <Settings />;
-      default:
-        return <Dashboard />;
-    }
-  };
+  //     case "query":
+  //       return <LoanComparison
+  //       loanData={LoanData}
+  //       setCurrentScreen={setCurrentScreen}
+  //       // setSelectedLoanId={setSelectedLoanId}
+  //       />;
+  //     case "compare-loans":
+  //       return <LoanComparison
+  //       setCurrentScreen={setCurrentScreen}
+  //       setSelectedLoanId={setSelectedLoanId}
+  //       mode="compare-loans"
+  //       />;
+  //     case "reports":
+  //       return <Reports />;
+  //     case "timeline":
+  //       return <Timeline />;
+  //     case "notifications":
+  //       return <Notifications />;
+  //     case "settings":
+  //       return <Settings />;
+  //     default:
+  //       return <Dashboard />;
+  //   }
+  // };
+ 
 
   return (
     <Layout
@@ -125,7 +154,60 @@ function App() {
       setCurrentScreen={setCurrentScreen}
       onSignOut={handleSignOut}
     >
-      {renderScreen()}
+       <Routes>
+    <Route path="/dashboard" element={<Dashboard />} />
+
+    <Route
+      path="/upload"
+      element={
+        <Upload
+          currentScreen={currentScreen}
+          setCurrentScreen={setCurrentScreen}
+          setSelectedLoanId={setSelectedLoanId}
+        />
+      }
+    />
+
+    <Route
+      path="/portfolio"
+      element={
+        <Portfolio
+          setCurrentScreen={setCurrentScreen}
+          setSelectedLoanId={setSelectedLoanId}
+        />
+      }
+    />
+
+    <Route
+      path="/loan-details"
+      element={
+        <LoanDetails
+          loanId={selectedLoanId}
+          setCurrentScreen={setCurrentScreen}
+        />
+      }
+    />
+
+    <Route
+      path="/query"
+      element={
+        <LoanComparison
+          loanData={LoanData}
+          setCurrentScreen={setCurrentScreen}
+        />
+      }
+    />
+
+    <Route path="/reports" element={<Reports />} />
+    <Route path="/timeline" element={<Timeline />} />
+    <Route path="/notifications" element={<Notifications />} />
+    <Route path="/settings" element={<Settings setCurrentScreen={setCurrentScreen}/>} />
+
+    <Route path="/privacy" element={<Policy />} />
+
+    {/* Fallback */}
+    <Route path="*" element={<Navigate to="/dashboard" />} />
+  </Routes>;
     </Layout>
   );
 }

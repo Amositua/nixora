@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "../components/ui/Card";
-import Badge from "../components/ui/Badge";
+// import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 
 import LoanSection from "../components/loan/loanSection";
@@ -9,6 +9,10 @@ import LoanDetailItem from "../components/loan/loanDetailItem";
 export default function LoanDetails({ loanId, setCurrentScreen }) {
   const [loan, setLoan] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+const [deleting, setDeleting] = useState(false);
+
 
   useEffect(() => {
     if (!loanId) return;
@@ -56,9 +60,53 @@ export default function LoanDetails({ loanId, setCurrentScreen }) {
 
   if (!loan) return <p className="p-6">Loan not found</p>;
 
-  const { parties, facility, interest, fees, repayment, prepayment, utilisation, covenants, eventsOfDefault, representations, transfers, governingLaw } = loan.loanData;
+  const { parties, facility, interest, fees, repayment, prepayment, utilisation, covenants, eventsOfDefault, representations, 
+    // transfers,
+     governingLaw } = loan.loanData;
+
+  const handleDeleteLoan = async () => {
+  setDeleting(true); // optional: show "Deleting..."
+  try {
+    const token = localStorage.getItem("accessToken");
+
+    const res = await fetch(
+      `https://nixora-image-latest.onrender.com/api/loans/documents/delete-loan/${loanId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!res.ok) throw new Error("Failed to delete loan");
+
+    // ✅ Remove this loan from cached loan list
+    const user = localStorage.getItem("user");
+    const userId = user ? JSON.parse(user).userId : "guest";
+    const LIST_KEY = `loanDocuments:${userId}`;
+    const cachedList = JSON.parse(localStorage.getItem(LIST_KEY) || "[]");
+    const updatedList = cachedList.filter((l) => l.id !== loanId);
+    localStorage.setItem(LIST_KEY, JSON.stringify(updatedList));
+
+    // ✅ Remove loan detail cache
+    localStorage.removeItem(`loanDetail:${userId}:${loanId}`);
+
+    setDeleting(false);
+    setShowDeleteConfirm(false);
+
+    // Go back to Portfolio
+    setCurrentScreen("portfolio");
+  } catch (err) {
+    console.error("Failed to delete loan", err);
+    setDeleting(false);
+    alert("Failed to delete loan. Please try again.");
+  }
+};
+
 
   return (
+<>
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-semibold">Loan Document</h1>
@@ -225,7 +273,7 @@ export default function LoanDetails({ loanId, setCurrentScreen }) {
             <LoanDetailItem label="Transfer Conditions" value={transfers.transferConditions} />
         </LoanSection> */}
 
-        <div className="border-t border-gray-200 my-4"></div>
+        {/* <div className="border-t border-gray-200 my-4"></div> */}
 
         <LoanSection title="Governing Law">
             <LoanDetailItem label="Governing Law" value={governingLaw.governingLaw} />
@@ -233,10 +281,50 @@ export default function LoanDetails({ loanId, setCurrentScreen }) {
 
         </LoanSection>
 
-        <div className="border-t border-gray-200 my-4"></div>
+        {/* <div className="border-t border-gray-200 my-4"></div> */}
 
-        <Badge variant="success">{loan.status}</Badge>
+        {/* <Badge variant="success">{loan.status}</Badge> */}
+  <div className="flex justify-end pt-6 space-x-2">
+  <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>
+    Delete Loan
+  </Button>
+</div>
+
+
+
+
       </Card>
     </div>
+
+    {showDeleteConfirm && (
+  <div className="fixed top-0 inset-0 h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg p-6 w-96 space-y-4">
+      <h2 className="text-lg font-semibold text-gray-800">Confirm Delete</h2>
+      <p className="text-sm text-gray-600">
+        Are you sure you want to delete this loan? This action cannot be undone.
+      </p>
+      <div className="flex justify-end space-x-2">
+        <Button
+          variant="outline"
+          onClick={() => setShowDeleteConfirm(false)}
+          disabled={deleting}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="destructive"
+          onClick={handleDeleteLoan}
+          disabled={deleting}
+        >
+          {deleting ? "Deleting..." : "Delete"}
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+</>
   );
+  
 }
+
+

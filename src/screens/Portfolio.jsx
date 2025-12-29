@@ -9,11 +9,14 @@ import {
 import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
 
+console.log("Rendering Portfolio screen...");
+
 export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("Fetching loan documents for portfolio...");
     const fetchLoans = async () => {
       const user = localStorage.getItem("user");
       const userId = user ? JSON.parse(user).userId : "guest";
@@ -43,7 +46,7 @@ export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
           const parties = doc.loanData?.parties || {};
           // const facility = doc.loanData?.facility || {};
           // const pricing = doc.loanData?.interestPricing || {};
-           const interest = doc.loanData?.interest || {};
+          const interest = doc.loanData?.interest || {};
 
           return {
             id: doc.loanId,
@@ -114,11 +117,27 @@ export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Loan Portfolio</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Extracted loan agreements and counterparties
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Loan Portfolio
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Extracted loan agreements and counterparties
+          </p>
+        </div>
+        <div className="flex space-x-3">
+          {/* <Button variant="outline">
+          <Download className="w-4 h-4 mr-2" />
+          Export
+        </Button> */}
+          <Button
+            onClick={() => setCurrentScreen("upload")}
+            variant="primary"
+          >
+            Add Loan
+          </Button>
+        </div>
       </div>
 
       <Card>

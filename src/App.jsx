@@ -67,26 +67,46 @@ function App() {
   }
 
   if (!session) {
-    return (
-      <>
-        {currentScreen === "landing" && (
-          <Landing setCurrentScreen={setCurrentScreen} />
-        )}
-        {currentScreen === "signin" && (
-          <SignIn
-            setCurrentScreen={setCurrentScreen}
-            onAuthSuccess={(session) => {
-              setSession(session);
-              setCurrentScreen("dashboard");
-            }}
-          />
-        )}
-        {currentScreen === "signup" && (
-          <SignUp setCurrentScreen={setCurrentScreen} />
-        )}
-      </>
-    );
-  }
+  return (
+    <Routes>
+      <Route path="/" element={<Landing setCurrentScreen={setCurrentScreen} />} />
+      <Route path="/signin" element={
+      <SignIn
+        setCurrentScreen={setCurrentScreen}
+        onAuthSuccess={(session) => {
+          setSession(session);
+          setCurrentScreen("dashboard");
+        }}
+      />
+    } />
+    <Route path="/signup" element={<SignUp setCurrentScreen={setCurrentScreen} />} />
+      <Route path="/privacy" element={<Policy />} />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
+}
+
+  // if (!session) {
+  //   return (
+  //     <>
+  //       {currentScreen === "landing" && (
+  //         <Landing setCurrentScreen={setCurrentScreen} />
+  //       )}
+  //       {currentScreen === "signin" && (
+  //         <SignIn
+  //           setCurrentScreen={setCurrentScreen}
+  //           onAuthSuccess={(session) => {
+  //             setSession(session);
+  //             setCurrentScreen("dashboard");
+  //           }}
+  //         />
+  //       )}
+  //       {currentScreen === "signup" && (
+  //         <SignUp setCurrentScreen={setCurrentScreen} />
+  //       )}
+  //     </>
+  //   );
+  // }
 
   console.log("currentScreen inside session:", currentScreen);
   const user = localStorage.getItem("user");
@@ -202,12 +222,13 @@ function App() {
     <Route path="/timeline" element={<Timeline />} />
     <Route path="/notifications" element={<Notifications />} />
     <Route path="/settings" element={<Settings setCurrentScreen={setCurrentScreen}/>} />
-
-    <Route path="/privacy" element={<Policy />} />
+    
+    {/* <Route path="/privacy" element={<Policy />} /> */}
+    
 
     {/* Fallback */}
     <Route path="*" element={<Navigate to="/dashboard" />} />
-  </Routes>;
+  </Routes>
     </Layout>
   );
 }

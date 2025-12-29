@@ -9,8 +9,10 @@ import {
   CheckCircle,
 } from "lucide-react";
 import Button from "../components/ui/Button";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Landing({ setCurrentScreen }) {
+  const navigate = useNavigate();
   const features = [
     {
       icon: FileText,
@@ -301,6 +303,12 @@ export default function Landing({ setCurrentScreen }) {
                     <a href="#" className="hover:text-gray-900">
                       Contact
                     </a>
+                  </li>
+                  <li>
+                    
+<Link to="/privacy" className="hover:text-gray-900">
+  Privacy Policy
+</Link>
                   </li>
                 </ul>
               </div>

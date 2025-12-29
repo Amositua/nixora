@@ -22,6 +22,7 @@ export default function LoanComparison({ setCurrentScreen }) {
   const [selectedLoans, setSelectedLoans] = useState([]);
   const [availableLoans, setAvailableLoans] = useState([]);
   const [comparisonData, setComparisonData] = useState(null);
+  const [availableLoansLoading, setAvailableLoansLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showLoanSelector, setShowLoanSelector] = useState(false);
@@ -32,6 +33,16 @@ export default function LoanComparison({ setCurrentScreen }) {
   }, []);
 
   const fetchAvailableLoans = async () => {
+    const user = localStorage.getItem("user");
+    const userId = user ? JSON.parse(user).userId : "guest";
+    const cachedLoans = localStorage.getItem(`loanDocuments_compare:${userId}`);
+
+    if (cachedLoans) {
+      setAvailableLoans(JSON.parse(cachedLoans));
+      setAvailableLoansLoading(false);
+      return;
+    }
+    setAvailableLoansLoading(true);
     try {
       const token = localStorage.getItem("accessToken");
       const res = await fetch(
@@ -44,16 +55,23 @@ export default function LoanComparison({ setCurrentScreen }) {
       const data = await res.json();
       console.log("Available loans data:", data);
       setAvailableLoans(data || []);
+
+      const user = localStorage.getItem("user");
+      const userId = user ? JSON.parse(user).userId : "guest";
+      const STORAGE_KEY = `loanDocuments_compare:${userId}`;
+      // console.log("Storing recent uploads under key:", STORAGE_KEY);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      setAvailableLoansLoading(false);
     } catch (err) {
       console.error("Failed to fetch loans", err);
     }
   };
 
   const handleAddLoan = (loanId) => {
-    if (selectedLoans.length >= 3) {
-      setError("You can compare up to 3 loans at a time");
-      return;
-    }
+    // if (selectedLoans.length >= 3) {
+    //   setError("You can compare up to 3 loans at a time");
+    //   return;
+    // }
     if (!selectedLoans.includes(loanId)) {
       setSelectedLoans([...selectedLoans, loanId]);
       setShowLoanSelector(false);
@@ -94,6 +112,7 @@ export default function LoanComparison({ setCurrentScreen }) {
 
       const data = await res.json();
       setComparisonData(data);
+      console.log("Comparison data:", data);
     } catch (err) {
       setError(err.message);
       console.error("Comparison failed:", err);
@@ -104,7 +123,7 @@ export default function LoanComparison({ setCurrentScreen }) {
 
   const getWinnerInfo = (field) => {
     if (!comparisonData?.comparison) return null;
-    
+
     const fieldMap = {
       margin: "bestMargin",
       transferRestrictions: "mostTransferable",
@@ -175,7 +194,8 @@ export default function LoanComparison({ setCurrentScreen }) {
                     className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2"
                   >
                     <span className="text-sm font-medium text-blue-900">
-                      {loan?.borrower || loanId.substring(0, 8)}
+                      {loan?.loanData?.parties?.borrower ||
+                        loanId.substring(0, 8)}
                     </span>
                     <button
                       onClick={() => handleRemoveLoan(loanId)}
@@ -188,43 +208,54 @@ export default function LoanComparison({ setCurrentScreen }) {
               })}
 
               {/* Add Loan Button */}
-              {selectedLoans.length < 3 && (
-                <button
-                  onClick={() => setShowLoanSelector(!showLoanSelector)}
-                  className="flex items-center gap-2 border-2 border-dashed border-gray-300 rounded-lg px-4 py-2 hover:border-blue-400 hover:bg-blue-50 transition-colors"
-                >
-                  <Plus className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-600">
-                    Add Loan
-                  </span>
-                </button>
-              )}
+              {/* {selectedLoans.length < 3 && ( */}
+              <button
+                onClick={() => {
+                  setShowLoanSelector(!showLoanSelector);
+                  // fetchAvailableLoans();
+                }}
+                className="flex items-center gap-2 border-2 border-dashed border-gray-300 rounded-lg px-4 py-2 hover:border-blue-400 hover:bg-blue-50 transition-colors"
+              >
+                <Plus className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-600">
+                  Add Loan
+                </span>
+              </button>
+              {/* //   )} */}
             </div>
 
             {/* Loan Selector Dropdown */}
-            {showLoanSelector && (
-              <Card className="border-2 border-blue-200">
-                <CardContent className="p-4">
-                  <div className="max-h-64 overflow-y-auto space-y-2">
-                    {availableLoans
-                      .filter((loan) => !selectedLoans.includes(loan.loanId))
-                      .map((loan) => (
-                        <button
-                          key={loan.loanId}
-                          onClick={() => handleAddLoan(loan.loanId)}
-                          className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors"
-                        >
-                          <div className="font-medium text-gray-900">
-                            {loan.borrower}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {loan.facilityType} • {loan.benchmark}
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                </CardContent>
-              </Card>
+            {availableLoansLoading ? (
+              <div className="flex justify-center py-4">
+                <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+              </div>
+            ) : (
+              showLoanSelector && (
+                <Card className="border-2 border-blue-200">
+                  <CardContent className="p-4">
+                    <div className="max-h-64 overflow-y-auto space-y-2">
+                      {availableLoans
+                        .filter((loan) => !selectedLoans.includes(loan.loanId))
+                        .map((loan) => (
+                          <button
+                            key={loan.loanId}
+                            onClick={() => handleAddLoan(loan.loanId)}
+                            className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors"
+                          >
+                            <div className="font-medium text-gray-900">
+                              {loan.loanData.parties.borrower ||
+                                "Unknown Borrower"}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {loan.loanData.facility.facilityType} •{" "}
+                              {loan.loanData.interest.benchmark}
+                            </div>
+                          </button>
+                        ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )
             )}
 
             {/* Compare Button */}
@@ -285,7 +316,11 @@ export default function LoanComparison({ setCurrentScreen }) {
                       Most Transferable
                     </p>
                     <p className="text-sm font-semibold text-blue-900 mt-1">
-                      {comparisonData.comparison.mostTransferable?.substring(0, 8)}...
+                      {comparisonData.comparison.mostTransferable?.substring(
+                        0,
+                        8
+                      )}
+                      ...
                     </p>
                   </div>
                 </div>
@@ -303,7 +338,11 @@ export default function LoanComparison({ setCurrentScreen }) {
                       Most Lender Friendly
                     </p>
                     <p className="text-sm font-semibold text-purple-900 mt-1">
-                      {comparisonData.comparison.mostLenderFriendly?.substring(0, 8)}...
+                      {comparisonData.comparison.mostLenderFriendly?.substring(
+                        0,
+                        8
+                      )}
+                      ...
                     </p>
                   </div>
                 </div>
@@ -321,7 +360,11 @@ export default function LoanComparison({ setCurrentScreen }) {
                       Longest Maturity
                     </p>
                     <p className="text-sm font-semibold text-orange-900 mt-1">
-                      {comparisonData.comparison.longestMaturity?.substring(0, 8) || "N/A"}...
+                      {comparisonData.comparison.longestMaturity?.substring(
+                        0,
+                        8
+                      ) || "N/A"}
+                      ...
                     </p>
                   </div>
                 </div>
@@ -359,7 +402,10 @@ export default function LoanComparison({ setCurrentScreen }) {
                         Loan ID
                       </td>
                       {comparisonData.loans.map((loan) => (
-                        <td key={loan.loanId} className="px-6 py-4 text-sm text-gray-600">
+                        <td
+                          key={loan.loanId}
+                          className="px-6 py-4 text-sm text-gray-600"
+                        >
                           {loan.loanId.substring(0, 13)}...
                         </td>
                       ))}
@@ -373,7 +419,9 @@ export default function LoanComparison({ setCurrentScreen }) {
                       {comparisonData.loans.map((loan) => (
                         <td key={loan.loanId} className="px-6 py-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <span className="text-gray-900">{loan.margin || "N/A"}</span>
+                            <span className="text-gray-900">
+                              {loan.margin || "N/A"}
+                            </span>
                             {isWinner(loan.loanId, "margin") && (
                               <CheckCircle2 className="w-4 h-4 text-green-600" />
                             )}
@@ -389,7 +437,9 @@ export default function LoanComparison({ setCurrentScreen }) {
                       </td>
                       {comparisonData.loans.map((loan) => (
                         <td key={loan.loanId} className="px-6 py-4">
-                          <Badge variant="info">{loan.benchmark || "N/A"}</Badge>
+                          <Badge variant="info">
+                            {loan.benchmark || "N/A"}
+                          </Badge>
                         </td>
                       ))}
                     </tr>
@@ -402,7 +452,9 @@ export default function LoanComparison({ setCurrentScreen }) {
                       {comparisonData.loans.map((loan) => (
                         <td key={loan.loanId} className="px-6 py-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <span className="text-gray-900">{loan.maturity || "Not specified"}</span>
+                            <span className="text-gray-900">
+                              {loan.maturity || "Not specified"}
+                            </span>
                             {isWinner(loan.loanId, "maturity") && (
                               <CheckCircle2 className="w-4 h-4 text-orange-600" />
                             )}
@@ -417,7 +469,10 @@ export default function LoanComparison({ setCurrentScreen }) {
                         Tenor (Months)
                       </td>
                       {comparisonData.loans.map((loan) => (
-                        <td key={loan.loanId} className="px-6 py-4 text-sm text-gray-900">
+                        <td
+                          key={loan.loanId}
+                          className="px-6 py-4 text-sm text-gray-900"
+                        >
                           {loan.tenorMonths || "N/A"}
                         </td>
                       ))}
@@ -429,7 +484,10 @@ export default function LoanComparison({ setCurrentScreen }) {
                         Prepayment Allowed
                       </td>
                       {comparisonData.loans.map((loan) => (
-                        <td key={loan.loanId} className="px-6 py-4 text-sm text-gray-900">
+                        <td
+                          key={loan.loanId}
+                          className="px-6 py-4 text-sm text-gray-900"
+                        >
                           {loan.prepaymentAllowed === null
                             ? "Not specified"
                             : loan.prepaymentAllowed
@@ -465,7 +523,11 @@ export default function LoanComparison({ setCurrentScreen }) {
                       </td>
                       {comparisonData.loans.map((loan) => (
                         <td key={loan.loanId} className="px-6 py-4">
-                          <Badge variant={loan.covenantCount > 0 ? "warning" : "success"}>
+                          <Badge
+                            variant={
+                              loan.covenantCount > 0 ? "warning" : "success"
+                            }
+                          >
                             {loan.covenantCount}
                           </Badge>
                         </td>
@@ -480,7 +542,11 @@ export default function LoanComparison({ setCurrentScreen }) {
                       {comparisonData.loans.map((loan) => (
                         <td key={loan.loanId} className="px-6 py-4">
                           <div className="flex items-center gap-2">
-                            <Badge variant={loan.defaultCount > 0 ? "danger" : "success"}>
+                            <Badge
+                              variant={
+                                loan.defaultCount > 0 ? "danger" : "success"
+                              }
+                            >
                               {loan.defaultCount}
                             </Badge>
                             {isWinner(loan.loanId, "defaultCount") && (
@@ -497,7 +563,10 @@ export default function LoanComparison({ setCurrentScreen }) {
                         Governing Law
                       </td>
                       {comparisonData.loans.map((loan) => (
-                        <td key={loan.loanId} className="px-6 py-4 text-sm text-gray-900">
+                        <td
+                          key={loan.loanId}
+                          className="px-6 py-4 text-sm text-gray-900"
+                        >
                           {loan.governingLaw || "Not specified"}
                         </td>
                       ))}
@@ -509,7 +578,10 @@ export default function LoanComparison({ setCurrentScreen }) {
                         Utilisation Date
                       </td>
                       {comparisonData.loans.map((loan) => (
-                        <td key={loan.loanId} className="px-6 py-4 text-sm text-gray-900">
+                        <td
+                          key={loan.loanId}
+                          className="px-6 py-4 text-sm text-gray-900"
+                        >
                           {loan.utilisationDate || "Not specified"}
                         </td>
                       ))}

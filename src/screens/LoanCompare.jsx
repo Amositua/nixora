@@ -139,6 +139,30 @@ export default function LoanComparison({ setCurrentScreen }) {
     return getWinnerInfo(field) === loanId;
   };
 
+   const getLoanDetails = (loanId) => {
+    if (!loanId) return null;
+    return comparisonData?.loans?.find(loan => loan.loanId === loanId);
+  };
+
+  const getAvailableLoanInfo = (loanId) => {
+    if (!loanId) return null;
+    return availableLoans.find(loan => loan.loanId === loanId);
+  };
+
+  const getDisplayName = (loanId) => {
+    if (!loanId) return "N/A";
+    
+    // First try to get from available loans (has borrower info)
+    const availableLoan = getAvailableLoanInfo(loanId);
+    if (availableLoan?.loanData?.parties?.borrower) {
+      return availableLoan.loanData.parties.borrower;
+    }
+    
+    // Fallback to showing truncated ID
+    return loanId.substring(0, 8) + "...";
+  };
+
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -298,8 +322,13 @@ export default function LoanComparison({ setCurrentScreen }) {
                       Best Margin
                     </p>
                     <p className="text-sm font-semibold text-green-900 mt-1">
-                      {comparisonData.comparison.bestMargin?.substring(0, 8)}...
+                     {getDisplayName(comparisonData.comparison.bestMargin)}
                     </p>
+                    {comparisonData.comparison.bestMargin && (
+                      <p className="text-xs text-green-700 mt-0.5">
+                        {getLoanDetails(comparisonData.comparison.bestMargin)?.margin}
+                      </p>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -316,12 +345,13 @@ export default function LoanComparison({ setCurrentScreen }) {
                       Most Transferable
                     </p>
                     <p className="text-sm font-semibold text-blue-900 mt-1">
-                      {comparisonData.comparison.mostTransferable?.substring(
-                        0,
-                        8
-                      )}
-                      ...
+                      {getDisplayName(comparisonData.comparison.mostTransferable)}
                     </p>
+                    {comparisonData.comparison.mostTransferable && (
+                      <p className="text-xs text-blue-700 mt-0.5">
+                        {getLoanDetails(comparisonData.comparison.mostTransferable)?.transferRestrictions || "null"}
+                      </p>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -338,12 +368,13 @@ export default function LoanComparison({ setCurrentScreen }) {
                       Most Lender Friendly
                     </p>
                     <p className="text-sm font-semibold text-purple-900 mt-1">
-                      {comparisonData.comparison.mostLenderFriendly?.substring(
-                        0,
-                        8
-                      )}
-                      ...
+                      {getDisplayName(comparisonData.comparison.mostLenderFriendly)}
                     </p>
+                    {comparisonData.comparison.mostLenderFriendly && (
+                      <p className="text-xs text-purple-700 mt-0.5">
+                        {getLoanDetails(comparisonData.comparison.mostLenderFriendly)?.defaultCount} default events
+                      </p>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -360,12 +391,16 @@ export default function LoanComparison({ setCurrentScreen }) {
                       Longest Maturity
                     </p>
                     <p className="text-sm font-semibold text-orange-900 mt-1">
-                      {comparisonData.comparison.longestMaturity?.substring(
-                        0,
-                        8
-                      ) || "N/A"}
-                      ...
+                      {comparisonData.comparison.longestMaturity 
+                        ? getDisplayName(comparisonData.comparison.longestMaturity)
+                        : "N/A"}
                     </p>
+                    {comparisonData.comparison.longestMaturity && (
+                      <p className="text-xs text-orange-700 mt-0.5">
+                        {getLoanDetails(comparisonData.comparison.longestMaturity)?.maturity || 
+                         `${getLoanDetails(comparisonData.comparison.longestMaturity)?.tenorMonths} months`}
+                      </p>
+                    )}
                   </div>
                 </div>
               </CardContent>

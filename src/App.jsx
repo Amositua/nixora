@@ -211,13 +211,23 @@ function App() {
     <Route
       path="/query"
       element={
-        <LoanComparison
+        <QueryBuilder
           loanData={LoanData}
           setCurrentScreen={setCurrentScreen}
         />
       }
     />
 
+    <Route
+      path="/compare-loans"
+      element={
+        <LoanComparison
+          setCurrentScreen={setCurrentScreen}
+          setSelectedLoanId={setSelectedLoanId}
+          mode="compare-loans"
+        />
+      }
+    />
     <Route path="/reports" element={<Reports />} />
     <Route path="/timeline" element={<Timeline />} />
     <Route path="/notifications" element={<Notifications />} />

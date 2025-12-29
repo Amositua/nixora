@@ -37,6 +37,7 @@ export default function Layout({
     { id: "upload", label: "Upload Loans", icon: Upload },
     { id: "portfolio", label: "Loan Portfolio", icon: FolderOpen },
     { id: "query", label: "Search & Queries", icon: Search },
+    { id: "compare-loans", label: "Compare Loans", icon: FileText },
     { id: "reports", label: "Reports", icon: FileText },
     { id: "timeline", label: "Loan Timelines", icon: Calendar },
     { id: "notifications", label: "Notifications", icon: Bell },

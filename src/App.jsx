@@ -19,6 +19,9 @@ import { authService } from "./services/authServices";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
 import LoanDetails from "./screens/LoanDetails";
+import LoanTimeline from "./screens/Timeline";
+import LoanTimelineDetail from "./screens/TimelineDetail";
+import LoanList from "./screens/time";
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState("landing");
@@ -229,7 +232,14 @@ function App() {
       }
     />
     <Route path="/reports" element={<Reports />} />
-    <Route path="/timeline" element={<Timeline />} />
+
+
+    <Route path="/timeline" element={<LoanList setSelectedLoanId={setSelectedLoanId} setCurrentScreen={setCurrentScreen}/>} />
+
+
+    <Route path="/timeline-detail" element={<LoanTimelineDetail loanId={selectedLoanId} setCurrentScreen={setCurrentScreen}/>} />
+
+
     <Route path="/notifications" element={<Notifications />} />
     <Route path="/settings" element={<Settings setCurrentScreen={setCurrentScreen}/>} />
     

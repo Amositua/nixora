@@ -84,7 +84,7 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
         setRecentUploads((prev) => {
           const updated = [
             {
-              id: res.data.documentId,
+              id: res.data.loanId,
               // name: file.name,
               borrower: parties.borrower || "-",
               lender: parties.lenders[0] || "-",
@@ -189,7 +189,7 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
       <Card>
         <CardContent className="py-12">
           <div
-            className={`relative border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
+            className={`relative border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
               dragActive
                 ? "border-blue-500 bg-blue-50"
                 : "border-gray-300 hover:border-gray-400 bg-gray-50"
@@ -204,7 +204,7 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
               multiple
               accept=".pdf,.doc,.docx"
               onChange={handleFileSelect}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              className="absolute inset-0  opacity-0 cursor-pointer"
             />
 
             <div className="space-y-4">

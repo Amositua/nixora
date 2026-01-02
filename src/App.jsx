@@ -30,70 +30,30 @@ function App() {
 
   const [selectedLoanId, setSelectedLoanId] = useState(null);
 
-// Handle Trello OAuth callback
+  useEffect(() => {
+    const session = authService.getSession();
 
-useEffect(() => {
-  const hash = window.location.hash;
+    if (session) {
+      setSession(session);
+      setCurrentScreen("dashboard");
+    }
 
-  if (hash.startsWith("#token=")) {
-    const token = hash.split("token=")[1];
+    console.log("Auth session checkeddddd:", session);
+    // console.log("Current Screen on load:", currentScreen);
 
-    fetch("/api/trello/callback", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token })
-    });
-
-    // remove token from URL so it doesn't leak
-    window.history.replaceState(null, "", "/");
-  }
-}, []);
-
-useEffect(() => {
-  const hash = window.location.hash;
-
-  // 🚨 If Trello callback exists, DO NOTHING ELSE
-  if (hash.startsWith("#token=")) {
-    const token = hash.split("token=")[1];
-
-    fetch("/api/trello/callback", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
-    });
-
-    // Optional: keep page clean
-    window.history.replaceState(null, "", window.location.pathname);
-
-    // ⛔ STOP further redirects
     setLoading(false);
-    return;
-  }
-
-  const session = authService.getSession();
-
-  if (session) {
-    setSession(session);
-    setCurrentScreen("dashboard");
-  }
-  console.log("Auth session checked:", session);
-  setLoading(false);
-}, []);
-
+  }, []);
 
   const navigate = useNavigate();
 
- useEffect(() => {
-  // 🚨 Do not auto-navigate if Trello token is in URL
-  if (window.location.hash.startsWith("#token=")) return;
-
-  if (!loading) {
-    navigate(
-      currentScreen === "dashboard" ? "/dashboard" : `/${currentScreen}`,
-      { replace: true }
-    );
-  }
-}, [currentScreen, loading]);
+  useEffect(() => {
+    if (!loading) {
+      navigate(
+        currentScreen === "dashboard" ? "/dashboard" : `/${currentScreen}`,
+        { replace: true }
+      );
+    }
+  }, [currentScreen]);
 
   const handleSignOut = () => {
     authService.logout();
@@ -110,33 +70,24 @@ useEffect(() => {
   }
 
   if (!session) {
-    return (
-      <Routes>
-        <Route
-          path="/"
-          element={<Landing setCurrentScreen={setCurrentScreen} />}
-        />
-        <Route
-          path="/signin"
-          element={
-            <SignIn
-              setCurrentScreen={setCurrentScreen}
-              onAuthSuccess={(session) => {
-                setSession(session);
-                setCurrentScreen("dashboard");
-              }}
-            />
-          }
-        />
-        <Route
-          path="/signup"
-          element={<SignUp setCurrentScreen={setCurrentScreen} />}
-        />
-        <Route path="/privacy" element={<Policy />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    );
-  }
+  return (
+    <Routes>
+      <Route path="/" element={<Landing setCurrentScreen={setCurrentScreen} />} />
+      <Route path="/signin" element={
+      <SignIn
+        setCurrentScreen={setCurrentScreen}
+        onAuthSuccess={(session) => {
+          setSession(session);
+          setCurrentScreen("dashboard");
+        }}
+      />
+    } />
+    <Route path="/signup" element={<SignUp setCurrentScreen={setCurrentScreen} />} />
+      <Route path="/privacy" element={<Policy />} />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
+}
 
   // if (!session) {
   //   return (
@@ -219,99 +170,86 @@ useEffect(() => {
   //   }
   // };
 
+ 
+
   return (
     <Layout
       currentScreen={currentScreen}
       setCurrentScreen={setCurrentScreen}
       onSignOut={handleSignOut}
     >
-      <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
+       <Routes>
+    <Route path="/dashboard" element={<Dashboard />} />
 
-        <Route
-          path="/upload"
-          element={
-            <Upload
-              currentScreen={currentScreen}
-              setCurrentScreen={setCurrentScreen}
-              setSelectedLoanId={setSelectedLoanId}
-            />
-          }
+    <Route
+      path="/upload"
+      element={
+        <Upload
+          currentScreen={currentScreen}
+          setCurrentScreen={setCurrentScreen}
+          setSelectedLoanId={setSelectedLoanId}
         />
+      }
+    />
 
-        <Route
-          path="/portfolio"
-          element={
-            <Portfolio
-              setCurrentScreen={setCurrentScreen}
-              setSelectedLoanId={setSelectedLoanId}
-            />
-          }
+    <Route
+      path="/portfolio"
+      element={
+        <Portfolio
+          setCurrentScreen={setCurrentScreen}
+          setSelectedLoanId={setSelectedLoanId}
         />
+      }
+    />
 
-        <Route
-          path="/loan-details"
-          element={
-            <LoanDetails
-              loanId={selectedLoanId}
-              setCurrentScreen={setCurrentScreen}
-            />
-          }
+    <Route
+      path="/loan-details"
+      element={
+        <LoanDetails
+          loanId={selectedLoanId}
+          setCurrentScreen={setCurrentScreen}
         />
+      }
+    />
 
-        <Route
-          path="/query"
-          element={
-            <QueryBuilder
-              loanData={LoanData}
-              setCurrentScreen={setCurrentScreen}
-            />
-          }
+    <Route
+      path="/query"
+      element={
+        <QueryBuilder
+          loanData={LoanData}
+          setCurrentScreen={setCurrentScreen}
         />
+      }
+    />
 
-        <Route
-          path="/compare-loans"
-          element={
-            <LoanComparison
-              setCurrentScreen={setCurrentScreen}
-              setSelectedLoanId={setSelectedLoanId}
-              mode="compare-loans"
-            />
-          }
+    <Route
+      path="/compare-loans"
+      element={
+        <LoanComparison
+          setCurrentScreen={setCurrentScreen}
+          setSelectedLoanId={setSelectedLoanId}
+          mode="compare-loans"
         />
-        <Route path="/reports" element={<Reports />} />
+      }
+    />
+    <Route path="/reports" element={<Reports />} />
 
-        <Route
-          path="/timeline"
-          element={
-            <LoanList
-              setSelectedLoanId={setSelectedLoanId}
-              setCurrentScreen={setCurrentScreen}
-            />
-          }
-        />
 
-        <Route
-          path="/timeline-detail"
-          element={
-            <LoanTimelineDetail
-              loanId={selectedLoanId}
-              setCurrentScreen={setCurrentScreen}
-            />
-          }
-        />
+    <Route path="/timeline" element={<LoanList setSelectedLoanId={setSelectedLoanId} setCurrentScreen={setCurrentScreen}/>} />
 
-        <Route path="/notifications" element={<Notifications />} />
-        <Route
-          path="/settings"
-          element={<Settings setCurrentScreen={setCurrentScreen} />}
-        />
 
-        {/* <Route path="/privacy" element={<Policy />} /> */}
+    <Route path="/timeline-detail" element={<LoanTimelineDetail loanId={selectedLoanId} setCurrentScreen={setCurrentScreen}/>} />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      </Routes>
+
+    <Route path="/notifications" element={<Notifications />} />
+    <Route path="/settings" element={<Settings setCurrentScreen={setCurrentScreen}/>} />
+    
+    {/* <Route path="/privacy" element={<Policy />} /> */}
+    
+
+    {/* Fallback */}
+    <Route path="*" element={<Navigate to="/dashboard" />} />
+  </Routes>
     </Layout>
   );
 }

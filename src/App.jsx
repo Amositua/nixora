@@ -49,32 +49,51 @@ useEffect(() => {
   }
 }, []);
 
+useEffect(() => {
+  const hash = window.location.hash;
 
+  // 🚨 If Trello callback exists, DO NOTHING ELSE
+  if (hash.startsWith("#token=")) {
+    const token = hash.split("token=")[1];
 
-  useEffect(() => {
-    const session = authService.getSession();
+    fetch("/api/trello/callback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
 
-    if (session) {
-      setSession(session);
-      setCurrentScreen("dashboard");
-    }
+    // Optional: keep page clean
+    window.history.replaceState(null, "", window.location.pathname);
 
-    console.log("Auth session checked:", session);
-    // console.log("Current Screen on load:", currentScreen);
-
+    // ⛔ STOP further redirects
     setLoading(false);
-  }, []);
+    return;
+  }
+
+  const session = authService.getSession();
+
+  if (session) {
+    setSession(session);
+    setCurrentScreen("dashboard");
+  }
+  console.log("Auth session checked:", session);
+  setLoading(false);
+}, []);
+
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!loading) {
-      navigate(
-        currentScreen === "dashboard" ? "/dashboard" : `/${currentScreen}`,
-        { replace: true }
-      );
-    }
-  }, [currentScreen]);
+ useEffect(() => {
+  // 🚨 Do not auto-navigate if Trello token is in URL
+  if (window.location.hash.startsWith("#token=")) return;
+
+  if (!loading) {
+    navigate(
+      currentScreen === "dashboard" ? "/dashboard" : `/${currentScreen}`,
+      { replace: true }
+    );
+  }
+}, [currentScreen, loading]);
 
   const handleSignOut = () => {
     authService.logout();

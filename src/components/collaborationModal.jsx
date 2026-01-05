@@ -11,6 +11,7 @@ import {
 } from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { FileText, CheckCircle, X } from "lucide-react";
+import { Loader } from "lucide-react";
 
 export function CollaborationAcceptModal({ token, onAccept, onDecline }) {
   const [accepting, setAccepting] = useState(false);

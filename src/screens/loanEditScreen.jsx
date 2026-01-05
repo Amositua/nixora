@@ -20,6 +20,7 @@ import {
   Shield,
   TrendingUp,
   FileCheck,
+  RefreshCw,
 } from "lucide-react";
 
 import { CollaborationInviteButton } from "../components/CollaborateButton.jsx";
@@ -27,6 +28,7 @@ import { CollaborationInviteButton } from "../components/CollaborateButton.jsx";
 export default function LoanDocumentEditor({ loanId, setCurrentScreen }) {
   const [loan, setLoan] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshLoading, setRefreshLoading] = useState(false)
   const [editingField, setEditingField] = useState(null);
   const [editValue, setEditValue] = useState("");
   const [saving, setSaving] = useState(false);
@@ -83,6 +85,42 @@ export default function LoanDocumentEditor({ loanId, setCurrentScreen }) {
       console.error("Failed to fetch loan details:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  //fetch lona refresh
+  const fetchLoanDetailsOnRefresh = async () => {
+    const user = localStorage.getItem("user");
+    const userId = user ? JSON.parse(user).userId : "guest";
+    const CACHE_KEY = `loanDetail:${userId}:${loanId}`;
+
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      setLoan(JSON.parse(cached));
+      setRefreshLoading(false);
+    }
+    setRefreshLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(
+        `https://nixora-image-latest.onrender.com/api/loans/documents/getLoan/${loanId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch loan details");
+
+      const data = await res.json();
+      setLoan(data);
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+    } catch (err) {
+      setError(err.message);
+      console.error("Failed to fetch loan details:", err);
+    } finally {
+      setRefreshLoading(false);
     }
   };
 
@@ -339,6 +377,15 @@ export default function LoanDocumentEditor({ loanId, setCurrentScreen }) {
         </div>
         <div className="flex items-center gap-3">
              <CollaborationInviteButton loanId={loanId} />
+              {/* Refresh Button */}
+          <Button
+            variant="outline"
+            onClick={fetchLoanDetailsOnRefresh}
+            disabled={refreshLoading}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${refreshLoading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
           {/* <Badge
             variant={loan.status === "EDITED" ? "warning" : "success"}
           >

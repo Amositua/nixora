@@ -41,7 +41,8 @@ export default function Layout({
     { id: "compare-loans", label: "Compare Loans", icon: FileText },
     { id: "reports", label: "Reports", icon: FileText },
     { id: "timeline", label: "Loan Timelines", icon: Calendar },
-    { id: "notifications", label: "Notifications", icon: Bell },
+    // { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "collaborate", label: "collaborate and Edit", icon: FileText},
     { id: "settings", label: "Settings", icon: Settings },
   ];
 

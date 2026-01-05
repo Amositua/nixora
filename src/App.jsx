@@ -27,6 +27,7 @@ import LoanFieldEditor from "./screens/loanEditScreen";
 
 import { CollaborationAcceptModal } from "./components/collaborationModal.jsx";
 import { SharedDocuments } from "./screens/ShareDocumentList.jsx";
+import CollaborateAndEdit from "./screens/CollaborateAndEdit.jsx";
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState("landing");
@@ -41,13 +42,13 @@ function App() {
   useEffect(() => {
     const path = window.location.pathname;
     const inviteMatch = path.match(/\/invite\/([a-f0-9-]+)/i);
-    
+
     if (inviteMatch) {
       const token = inviteMatch[1];
-      
+
       // Check if user is authenticated
       const authToken = localStorage.getItem("accessToken");
-      
+
       if (authToken) {
         // User is logged in, show invite modal
         setInviteToken(token);
@@ -57,14 +58,13 @@ function App() {
         sessionStorage.setItem("pending_invite_token", token);
         setCurrentScreen("signin");
       }
-      
+
       // Clean URL
       window.history.replaceState({}, "", "/");
     }
   }, []);
 
-
-   // Check for pending invite after sign in
+  // Check for pending invite after sign in
   useEffect(() => {
     if (currentScreen === "dashboard") {
       const pendingToken = sessionStorage.getItem("pending_invite_token");
@@ -79,10 +79,10 @@ function App() {
   const handleAcceptInvitation = (data) => {
     setShowInviteModal(false);
     setInviteToken(null);
-    
+
     // Navigate to shared documents
-    setCurrentScreen("shared-documents");
-    
+    setCurrentScreen("collaborate");
+
     // Show success message
     // You can add a toast notification here
   };
@@ -93,22 +93,22 @@ function App() {
   };
 
   useEffect(() => {
-  // Check if this is the popup window with a token
-  const hash = window.location.hash;
-  
-  if (hash.includes("token=") && window.opener) {
-    const token = hash.split("token=")[1];
-    
-    // Send token to parent window
-    window.opener.postMessage(
-      { type: 'TRELLO_TOKEN', token },
-      window.location.origin
-    );
-    
-    // Close the popup
-    window.close();
-  }
-}, []);
+    // Check if this is the popup window with a token
+    const hash = window.location.hash;
+
+    if (hash.includes("token=") && window.opener) {
+      const token = hash.split("token=")[1];
+
+      // Send token to parent window
+      window.opener.postMessage(
+        { type: "TRELLO_TOKEN", token },
+        window.location.origin
+      );
+
+      // Close the popup
+      window.close();
+    }
+  }, []);
 
   useEffect(() => {
     const session = authService.getSession();
@@ -150,24 +150,33 @@ function App() {
   }
 
   if (!session) {
-  return (
-    <Routes>
-      <Route path="/" element={<Landing setCurrentScreen={setCurrentScreen} />} />
-      <Route path="/signin" element={
-      <SignIn
-        setCurrentScreen={setCurrentScreen}
-        onAuthSuccess={(session) => {
-          setSession(session);
-          setCurrentScreen("dashboard");
-        }}
-      />
-    } />
-    <Route path="/signup" element={<SignUp setCurrentScreen={setCurrentScreen} />} />
-      <Route path="/privacy" element={<Policy />} />
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
-  );
-}
+    return (
+      <Routes>
+        <Route
+          path="/"
+          element={<Landing setCurrentScreen={setCurrentScreen} />}
+        />
+        <Route
+          path="/signin"
+          element={
+            <SignIn
+              setCurrentScreen={setCurrentScreen}
+              onAuthSuccess={(session) => {
+                setSession(session);
+                setCurrentScreen("dashboard");
+              }}
+            />
+          }
+        />
+        <Route
+          path="/signup"
+          element={<SignUp setCurrentScreen={setCurrentScreen} />}
+        />
+        <Route path="/privacy" element={<Policy />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    );
+  }
 
   // if (!session) {
   //   return (
@@ -250,102 +259,130 @@ function App() {
   //   }
   // };
 
- 
-
   return (
     <Layout
       currentScreen={currentScreen}
       setCurrentScreen={setCurrentScreen}
       onSignOut={handleSignOut}
     >
-       <Routes>
-    <Route path="/dashboard" element={<Dashboard />} />
+      <Routes>
+        <Route path="/dashboard" element={<Dashboard />} />
 
-    <Route
-      path="/upload"
-      element={
-        <Upload
-          currentScreen={currentScreen}
-          setCurrentScreen={setCurrentScreen}
-          setSelectedLoanId={setSelectedLoanId}
+        <Route
+          path="/upload"
+          element={
+            <Upload
+              currentScreen={currentScreen}
+              setCurrentScreen={setCurrentScreen}
+              setSelectedLoanId={setSelectedLoanId}
+            />
+          }
         />
-      }
-    />
 
-    <Route
-      path="/portfolio"
-      element={
-        <Portfolio
-          setCurrentScreen={setCurrentScreen}
-          setSelectedLoanId={setSelectedLoanId}
+        <Route
+          path="/portfolio"
+          element={
+            <Portfolio
+              setCurrentScreen={setCurrentScreen}
+              setSelectedLoanId={setSelectedLoanId}
+            />
+          }
         />
-      }
-    />
 
-    <Route
-      path="/loan-details"
-      element={
-        <LoanDetails
-          loanId={selectedLoanId}
-          setSelectedLoanId={setSelectedLoanId}
-          setCurrentScreen={setCurrentScreen}
+        <Route
+          path="/loan-details"
+          element={
+            <LoanDetails
+              loanId={selectedLoanId}
+              setSelectedLoanId={setSelectedLoanId}
+              setCurrentScreen={setCurrentScreen}
+            />
+          }
         />
-      }
-    />
 
-    <Route
-      path="/query"
-      element={
-        <QueryBuilder
-          loanData={LoanData}
-          setCurrentScreen={setCurrentScreen}
+        <Route
+          path="/query"
+          element={
+            <QueryBuilder
+              loanData={LoanData}
+              setCurrentScreen={setCurrentScreen}
+            />
+          }
         />
-      }
-    />
 
-    <Route
-      path="/edit-loan"
-      element={
-        <LoanFieldEditor
-          loanId={selectedLoanId}
-          setCurrentScreen={setCurrentScreen}
+        <Route
+          path="/edit-loan"
+          element={
+            <LoanFieldEditor
+              loanId={selectedLoanId}
+              setCurrentScreen={setCurrentScreen}
+            />
+          }
         />
-      }
-    />
 
-    <Route
-      path="/compare-loans"
-      element={
-        <LoanComparison
-          setCurrentScreen={setCurrentScreen}
-          setSelectedLoanId={setSelectedLoanId}
-          mode="compare-loans"
+        <Route
+          path="/compare-loans"
+          element={
+            <LoanComparison
+              setCurrentScreen={setCurrentScreen}
+              setSelectedLoanId={setSelectedLoanId}
+              mode="compare-loans"
+            />
+          }
         />
-      }
-    />
-    <Route path="/reports" element={<Reports />} />
+        <Route path="/reports" element={<Reports />} />
 
+        <Route
+          path="/timeline"
+          element={
+            <LoanList
+              setSelectedLoanId={setSelectedLoanId}
+              setCurrentScreen={setCurrentScreen}
+            />
+          }
+        />
 
-    <Route path="/timeline" element={<LoanList setSelectedLoanId={setSelectedLoanId} setCurrentScreen={setCurrentScreen}/>} />
+        <Route
+          path="/timeline-detail"
+          element={
+            <LoanTimelineDetail
+              loanId={selectedLoanId}
+              setCurrentScreen={setCurrentScreen}
+            />
+          }
+        />
 
+        <Route path="/notifications" element={<Notifications />} />
+        <Route
+          path="/settings"
+          element={<Settings setCurrentScreen={setCurrentScreen} />}
+        />
 
-    <Route path="/timeline-detail" element={<LoanTimelineDetail loanId={selectedLoanId} setCurrentScreen={setCurrentScreen}/>} />
+        {/* <Route path="/privacy" element={<Policy />} /> */}
+        {/* <Route
+          path="/shared-documents"
+          element={
+            <SharedDocuments
+              setCurrentScreen={setCurrentScreen}
+              setSelectedLoanId={setSelectedLoanId}
+            />
+          }
+        /> */}
 
+        <Route 
+        path="/collaborate"
+        element={
+          <CollaborateAndEdit
+            setCurrentScreen={setCurrentScreen}
+            setSelectedLoanId={setSelectedLoanId}
+            />
+        }
+        />
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/dashboard" />} />
+      </Routes>
 
-    <Route path="/notifications" element={<Notifications />} />
-    <Route path="/settings" element={<Settings setCurrentScreen={setCurrentScreen}/>} />
-    
-    {/* <Route path="/privacy" element={<Policy />} /> */}
-    <Route path="/shared-documents" element={<SharedDocuments
-          setCurrentScreen={setCurrentScreen}
-          setSelectedLoanId={setSelectedLoanId}
-        />}
-/>
-    {/* Fallback */}
-    <Route path="*" element={<Navigate to="/dashboard" />} />
-  </Routes>
-
-  {/* {currentScreen === "shared-documents" && (
+      {/* {currentScreen === "shared-documents" && (
         
       )} */}
 

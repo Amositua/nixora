@@ -1,6 +1,10 @@
+import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { TrendingUp, DollarSign, Calendar, CheckCircle, AlertTriangle } from 'lucide-react';
 import Badge from '../components/ui/Badge';
+
+import { registerForPushNotifications } from '../utils/registerPushNotification';
+import { registerDevice } from '../api/register-device';
 
 export default function Dashboard() {
   const overviewCards = [
@@ -89,6 +93,22 @@ export default function Dashboard() {
     },
   ];
 
+
+  useEffect(() => {
+    const setupNotifications = async () => {
+      try {
+        const fcmToken = await registerForPushNotifications();
+        console.log("FcmToken:", fcmToken)
+        await registerDevice(fcmToken);
+        console.log("Push notifications enabled");
+      } catch (err) {
+        console.warn("Push notifications not enabled:", err.message);
+      }
+    };
+  
+    setupNotifications();
+  }, []);
+  
   const maxValue = Math.max(...maturityData.map(d => d.value));
 
   return (

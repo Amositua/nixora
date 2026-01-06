@@ -29,6 +29,9 @@ import { CollaborationAcceptModal } from "./components/collaborationModal.jsx";
 import { SharedDocuments } from "./screens/ShareDocumentList.jsx";
 import CollaborateAndEdit from "./screens/CollaborateAndEdit.jsx";
 
+import { registerForPushNotifications } from "./utils/registerPushNotification.js";
+import { registerDevice } from "./api/register-device.js";
+
 function App() {
   const [currentScreen, setCurrentScreen] = useState("landing");
   const [session, setSession] = useState(null);
@@ -39,6 +42,8 @@ function App() {
   // Handle collaboration invite token from URL
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteToken, setInviteToken] = useState(null);
+
+
   useEffect(() => {
     const path = window.location.pathname;
     const inviteMatch = path.match(/\/invite\/([a-f0-9-]+)/i);

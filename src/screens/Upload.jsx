@@ -7,8 +7,8 @@ import {
 } from "../components/ui/Card";
 import {
   Upload as UploadIcon,
-  // File,
-  // X,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
@@ -20,8 +20,13 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [recentUploads, setRecentUploads] = useState([]);
-
   const [isLoadingDocuments, setIsLoadingDocuments] = useState(true);
+  
+  // New states for progress and popups
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showFailurePopup, setShowFailurePopup] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   console.log("Files state:", files);
   console.log("Uploading state:", uploading);
@@ -61,57 +66,100 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
   console.log("Access Token:", accessToken);
   console.log("Refresh Token:", refreshToken);
 
-  const uploadFiles = async (files) => {
+ const uploadFiles = async (files) => {
     setUploading(true);
+    setUploadProgress(0);
+    setShowSuccessPopup(false);
+    setShowFailurePopup(false);
+    setUploadError("");
 
-    for (const file of files) {
-      const formData = new FormData();
-      formData.append("file", file);
+    const startTime = Date.now();
 
-      try {
-        const res = await api.post("/loans/documents/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append("file", file);
 
-        console.log("Upload response:", res);
-        // const data = res.data;
-        const parties = res.data?.loanData?.parties || {};
-        // const facility = res.data?.loanData?.facility || {};
-        const interest = res.data?.loanData?.interest || {};
-       
-        setRecentUploads((prev) => {
-          const updated = [
-            {
-              id: res.data.loanId,
-              // name: file.name,
-              borrower: parties.borrower || "-",
-              lender: parties.lenders[0] || "-",
-              facilityAgent: parties.facilityAgent || "-",
-              arranger: parties.arranger || "-",
-              guarantor: parties.guarantor || "-",
-              benchmark: interest.benchmark || "-",
-              status: res.data.status || "processing",
+        // Calculate progress for multiple files
+        const baseProgress = (i / files.length) * 100;
+
+        try {
+          const res = await api.post("/loans/documents/upload", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
             },
-            ...prev,
-          ];
-          const user = localStorage.getItem("user");
-          const userId = user ? JSON.parse(user).userId : "guest";
-          const STORAGE_KEY = `loanDocuments:${userId}`;
-          console.log("Storing recent uploads under key:", STORAGE_KEY);
+            onUploadProgress: (progressEvent) => {
+              if (progressEvent.total) {
+                // Upload progress accounts for 70% of each file's progress
+                const fileProgress = (progressEvent.loaded / progressEvent.total) * 70;
+                const totalProgress = baseProgress + (fileProgress / files.length);
+                setUploadProgress(Math.round(totalProgress));
+              }
+            },
+          });
 
-          // localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          // Simulate processing time (30% of progress per file)
+          const processingProgress = baseProgress + (70 / files.length);
+          setUploadProgress(Math.round(processingProgress));
+          
+          // Add small delay to show processing state
+          await new Promise(resolve => setTimeout(resolve, 300));
 
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-          return updated;
-        });
-      } catch (error) {
-        console.error("Upload failed", error);
+          console.log("Upload response:", res);
+          const document_name = res.data?.documentName || {}
+          const parties = res.data?.loanData?.parties || {};
+          const interest = res.data?.loanData?.interest || {};
+         
+          setRecentUploads((prev) => {
+            const updated = [
+              {
+                id: res.data.loanId,
+                document_name: document_name || "-",
+                borrower: parties.borrower || "-",
+                lender: parties.lenders[0] || "-",
+                // facilityAgent: parties.facilityAgent || "-",
+                arranger: parties.arranger || "-",
+                guarantor: parties.guarantor || "-",
+                benchmark: interest.benchmark || "-",
+                status: res.data.status || "processing",
+              },
+              ...prev,
+            ];
+            const user = localStorage.getItem("user");
+            const userId = user ? JSON.parse(user).userId : "guest";
+            const STORAGE_KEY = `loanDocuments:${userId}`;
+            console.log("Storing recent uploads under key:", STORAGE_KEY);
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+            return updated;
+          });
+        } catch (error) {
+          console.error("Upload failed for file:", file.name, error);
+          throw error; // Throw to trigger failure popup
+        }
       }
-    }
 
-    setUploading(false);
+      // All files uploaded successfully
+      setUploadProgress(100);
+      setShowSuccessPopup(true);
+      
+      // Hide success popup after 3 seconds
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+      }, 3000);
+
+    } catch (error) {
+      console.error("Upload failed", error);
+      setUploadError(error.response?.data?.message || error.message || "Upload failed. Please try again.");
+      setShowFailurePopup(true);
+    } finally {
+      setUploading(false);
+      // Reset progress after a delay
+      setTimeout(() => {
+        setUploadProgress(0);
+      }, 3000);
+    }
   };
 
   useEffect(() => {
@@ -143,15 +191,15 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
         console.log("Fetched documents:", data);
 
         const normalized = data.map((doc) => {
+          const document_name = doc.documentName || {}
           const parties = doc.loanData?.parties || {};
-          //  const facility = doc.loanData?.facilities || {};
            const interest = doc.loanData?.interest || {};
           return {
             id: doc.loanId,
-            // name: doc.documentUrl.split("/").pop(),
+            document_name: document_name || "-",
             borrower: parties.borrower || "-",
             lender: parties.lenders[0] || "-",
-            facilityAgent: parties.facilityAgent || "-",
+            // facilityAgent: parties.facilityAgent || "-",
             arranger: parties.arranger || "-",
             guarantor: parties.guarantor || "-",
             benchmark: interest.benchmark || "-",
@@ -163,7 +211,6 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
         const user = localStorage.getItem("user");
         const userId = user ? JSON.parse(user).userId : "guest";
         const STORAGE_KEY = `loanDocuments:${userId}`;
-        // console.log("Storing recent uploads under key:", STORAGE_KEY);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
       } catch (error) {
         console.error("Failed to fetch documents", error);
@@ -176,7 +223,8 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
   }, []);
 
   return (
-    <div className="p-6 space-y-6">
+    <>
+    <div className="p-6 space-y-4">
       <div>
         <h1 className="text-2xl font-semibold text-gray-900">
           Upload Loan Documents
@@ -221,16 +269,34 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
                   Supports PDF and Word documents up to 50MB
                 </p>
               </div>
-              {/* <div className="flex justify-center">
-                <Button variant="primary">Select Files</Button>
-              </div> */}
               <Button variant="primary" disabled={uploading}>
                 {uploading ? "Uploading..." : "Select Files"}
               </Button>
+
+              {/* Upload Progress Bar */}
+              {uploading && uploadProgress > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Uploading...
+                    </span>
+                    <span className="text-sm font-semibold text-blue-600">
+                      {uploadProgress}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
+
 
       <Card>
         <CardHeader>
@@ -266,16 +332,14 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
                 <thead className="bg-gray-50">
                   <tr>
                     {[
-                      // "Document",
+                      "Document Name",
                       "Borrower",
                       "Lender",
-                      "Facility Agent",
+                      // "Facility Agent",
                       "Arranger",
                       "Guarantor",
                       "Benchmark",
                       "Actions",
-                      // "Status",
-                      // "Actions",
                     ].map((h) => (
                       <th
                         key={h}
@@ -289,29 +353,21 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
                 <tbody className="divide-y">
                   {recentUploads.map((doc) => {
                     console.log("lender value:", doc.lender);
-                    // const StatusIcon = getStatusConfig(doc.status).icon;
                     return (
                       <tr
                         key={doc.id}
-                        // onClick={() => {
-                        //   setSelectedLoanId(doc.id);
-                        //   setCurrentScreen("loan-details");
-                        // }}
                         className="hover:bg-gray-50"
                       >
-                        {/* <td className="px-4 py-3 flex items-center gap-2">
-                          <File className="w-4 h-4 text-blue-600" />
-                          {doc.name}
-                        </td> */}
+
+                        <td className="px-4 py-3">{doc.document_name}</td>
                         <td className="px-4 py-3">{doc.borrower}</td>
                         <td className="px-4 py-3">{doc.lender}</td>
-                        <td className="px-4 py-3">{doc.facilityAgent}</td>
+                        {/* <td className="px-4 py-3">{doc.facilityAgent}</td> */}
                         <td className="px-4 py-3">{doc.arranger}</td>
                         <td className="px-4 py-3">{doc.guarantor}</td>
                         <td className="px-4 py-3">
                           <Badge variant="info">{doc.benchmark}</Badge>
                         </td>
-                        {/* ✅ ACTION COLUMN */}
                         <td className="px-4 py-3">
                           <Button
                             size="sm"
@@ -325,17 +381,6 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
                            More Details
                           </Button>
                         </td>
-                        {/* <td className="px-4 py-3">
-                          <Badge variant={getStatusConfig(doc.status).variant}>
-                            <StatusIcon className="w-3 h-3 mr-1" />
-                            {getStatusConfig(doc.status).label}
-                          </Badge>
-                        </td> */}
-                        {/* <td className="px-4 py-3">
-                          <button className="text-gray-400 hover:text-red-600">
-                            <X size={14} />
-                          </button>
-                        </td> */}
                       </tr>
                     );
                   })}
@@ -347,6 +392,65 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
           <div className="overflow-x-auto"></div>
         </CardContent>
       </Card>
+
+      
     </div>
+    
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-8 h-8 text-green-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Upload Successful!
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Your document{files.length > 1 ? 's have' : ' has'} been uploaded and is being processed.
+                </p>
+                <Button
+                  variant="primary"
+                  onClick={() => setShowSuccessPopup(false)}
+                  className="w-full"
+                >
+                  Continue
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Failure Popup */}
+      {showFailurePopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <XCircle className="w-8 h-8 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Upload Failed
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {uploadError || "Something went wrong while uploading your document. Please try again."}
+                </p>
+                <Button
+                  variant="primary"
+                  onClick={() => setShowFailurePopup(false)}
+                  className="w-full"
+                >
+                  Try Again
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      </>
   );
 }

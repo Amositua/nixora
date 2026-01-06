@@ -43,6 +43,7 @@ export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
         console.log("loan data:", data);
 
         const normalized = data.map((doc) => {
+          const document_name = doc.documentName || {}
           const parties = doc.loanData?.parties || {};
           // const facility = doc.loanData?.facility || {};
           // const pricing = doc.loanData?.interestPricing || {};
@@ -50,9 +51,10 @@ export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
 
           return {
             id: doc.loanId,
+            document_name: document_name || "-",
             borrower: parties.borrower || "-",
             lender: parties.lenders[0] || "-",
-            facilityAgent: parties.facilityAgent || "-",
+            // facilityAgent: parties.facilityAgent || "-",
             arranger: parties.arranger || "-",
             guarantor: parties.guarantor || "-",
 
@@ -158,9 +160,10 @@ export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
                   <tr>
                     {[
                       // "Document ID",
+                      "Document Name",
                       "Borrower",
                       "Lender",
-                      "Facility Agent",
+                      // "Facility Agent",
                       "arranger",
                       "guarantor",
                       "Benchmark",
@@ -193,9 +196,10 @@ export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
                       {/* <td className="px-4 py-3 text-sm font-mono text-gray-700">
                         {doc.id.slice(0, 8)}…
                       </td> */}
+                      <td className="px-4 py-3">{doc.document_name}</td>
                       <td className="px-4 py-3">{doc.borrower}</td>
                       <td className="px-4 py-3">{doc.lender}</td>
-                      <td className="px-4 py-3">{doc.facilityAgent}</td>
+                      {/* <td className="px-4 py-3">{doc.facilityAgent}</td> */}
                       <td className="px-4 py-3">{doc.arranger}</td>
                       <td className="px-4 py-3">{doc.guarantor}</td>
                       <td className="px-4 py-3">

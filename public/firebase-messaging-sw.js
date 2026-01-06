@@ -1,20 +1,19 @@
-importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js");
-
-firebase.initializeApp({
-  apiKey: "AIzaSyDfcSp1ndzCIp7O3eqE7lWxRVQnm-yWVuA",
-  authDomain: "nixora-web.firebaseapp.com",
-  projectId: "nixora-web",
-  messagingSenderId: "249772262718",
-  appId: "1:249772262718:web:98f7be4f873d1a0a70186f"
-});
-
-const messaging = firebase.messaging();
+// public/firebase-messaging-sw.js
 
 messaging.onBackgroundMessage((payload) => {
-    console.log("[SW] Background message:", payload);
-  self.registration.showNotification(payload.notification.title, {
-    body: payload.notification.body,
-    // icon: "/logo.jpeg",
-  });
+  console.log('[sw.js] Received background message ', payload);
+
+  // 1. Ensure the payload has notification data
+  const notificationTitle = payload.notification?.title || "Nixora Update";
+  const notificationOptions = {
+    body: payload.notification?.body || "Check your dashboard for updates",
+    icon: '/logo.jpeg', // Ensure this exists in /public/
+    badge: '/logo.jpeg',
+    data: {
+      url: payload.data?.url || '/' // Optional: for clicking the notification
+    }
+  };
+
+  // 2. YOU MUST RETURN THE PROMISE
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });

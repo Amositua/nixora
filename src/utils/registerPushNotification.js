@@ -8,9 +8,10 @@ export const registerForPushNotifications = async () => {
   if (permission !== "granted") {
     throw new Error("Notification permission denied");
   }
-
+ const registration = await navigator.serviceWorker.ready;
   const token = await getToken(messaging, {
     vapidKey: "BPgtK9wRvsgppA7He02Ne3uu4ZTLJuv8G_zViKYtMvthY8PDwn5dOCwngKazYUJ5HAWaiu96E_9tpb6AW0mc3tU",
+    serviceWorkerRegistration: registration,
   });
 
   if (!token) {

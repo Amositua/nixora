@@ -21,7 +21,7 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import LoanDetails from "./screens/LoanDetails";
 import LoanTimeline from "./screens/Timeline";
 import LoanTimelineDetail from "./screens/TimelineDetail";
-import LoanList from "./screens/time";
+import LoanList from "./screens/LoanTimelineList.jsx";
 
 import LoanFieldEditor from "./screens/loanEditScreen";
 

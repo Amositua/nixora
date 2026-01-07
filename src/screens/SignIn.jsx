@@ -91,7 +91,7 @@ export default function SignIn({ setCurrentScreen, onAuthSuccess }) {
                 id="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
@@ -104,7 +104,7 @@ export default function SignIn({ setCurrentScreen, onAuthSuccess }) {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 pr-10"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10"
                 />
                 <button
                   type="button"
@@ -120,7 +120,7 @@ export default function SignIn({ setCurrentScreen, onAuthSuccess }) {
               </div>
             </div>
 
-            <label className="flex items-center space-x-2">
+            {/* <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={rememberMe}
@@ -129,7 +129,7 @@ export default function SignIn({ setCurrentScreen, onAuthSuccess }) {
               <span className="text-sm text-gray-600">
                 Remember me on this device
               </span>
-            </label>
+            </label> */}
 
             <Button
               type="submit"

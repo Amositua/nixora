@@ -32,6 +32,8 @@ import CollaborateAndEdit from "./screens/CollaborateAndEdit.jsx";
 import { registerForPushNotifications } from "./utils/registerPushNotification.js";
 import { registerDevice } from "./api/register-device.js";
 
+import LoanDocumentChat from "./screens/LoanDocumentChat.jsx";
+
 function App() {
   const [currentScreen, setCurrentScreen] = useState("landing");
   const [session, setSession] = useState(null);
@@ -39,10 +41,11 @@ function App() {
 
   const [selectedLoanId, setSelectedLoanId] = useState(null);
 
+  const [selectedLoan, setSelectedLoan] = useState(null);
+
   // Handle collaboration invite token from URL
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteToken, setInviteToken] = useState(null);
-
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -145,6 +148,29 @@ function App() {
     setSession(null);
     setCurrentScreen("landing");
   };
+
+  // Fetch loan details when navigating to chat
+  useEffect(() => {
+    const fetchLoanForChat = async () => {
+      if (currentScreen === "loan-chat" && selectedLoanId) {
+        try {
+          const token = localStorage.getItem("accessToken");
+          const res = await fetch(
+            `https://nixora-image-latest.onrender.com/api/loans/documents/getLoan/${selectedLoanId}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          const data = await res.json();
+          setSelectedLoan(data);
+        } catch (error) {
+          console.error("Failed to fetch loan for chat:", error);
+        }
+      }
+    };
+
+    fetchLoanForChat();
+  }, [currentScreen, selectedLoanId]);
 
   if (loading) {
     return (
@@ -264,6 +290,25 @@ function App() {
   //   }
   // };
 
+  if (currentScreen === "loan-chat" && selectedLoanId) {
+    return (
+      <Layout
+        currentScreen={currentScreen}
+        setCurrentScreen={setCurrentScreen}
+        onSignOut={handleSignOut}
+      >
+        <Routes>
+          <Route path="/loan-chat" element={ <LoanDocumentChat
+        loanId={selectedLoanId}
+        loan={selectedLoan}
+        setCurrentScreen={setCurrentScreen}
+      />} />
+        </Routes>
+      </Layout>
+    );
+  }
+
+  
   return (
     <Layout
       currentScreen={currentScreen}
@@ -321,6 +366,7 @@ function App() {
             <LoanFieldEditor
               loanId={selectedLoanId}
               setCurrentScreen={setCurrentScreen}
+              setSelectedLoanId={setSelectedLoanId}
             />
           }
         />
@@ -374,14 +420,20 @@ function App() {
           }
         /> */}
 
-        <Route 
-        path="/collaborate"
-        element={
-          <CollaborateAndEdit
-            setCurrentScreen={setCurrentScreen}
-            setSelectedLoanId={setSelectedLoanId}
+        <Route path="/loan-chat" element={ <LoanDocumentChat
+        loanId={selectedLoanId}
+        loan={selectedLoan}
+        setCurrentScreen={setCurrentScreen}
+      />} />
+
+        <Route
+          path="/collaborate"
+          element={
+            <CollaborateAndEdit
+              setCurrentScreen={setCurrentScreen}
+              setSelectedLoanId={setSelectedLoanId}
             />
-        }
+          }
         />
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" />} />

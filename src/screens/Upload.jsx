@@ -119,7 +119,7 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
                 borrower: parties.borrower || "-",
                 lender: parties.lenders[0] || "-",
                 // facilityAgent: parties.facilityAgent || "-",
-                arranger: parties.arranger || "-",
+                // arranger: parties.arranger || "-",
                 guarantor: parties.guarantor || "-",
                 benchmark: interest.benchmark || "-",
                 status: res.data.status || "processing",
@@ -147,7 +147,7 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
       // Hide success popup after 3 seconds
       setTimeout(() => {
         setShowSuccessPopup(false);
-      }, 3000);
+      }, 8000);
 
     } catch (error) {
       console.error("Upload failed", error);
@@ -200,7 +200,7 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
             borrower: parties.borrower || "-",
             lender: parties.lenders[0] || "-",
             // facilityAgent: parties.facilityAgent || "-",
-            arranger: parties.arranger || "-",
+            // arranger: parties.arranger || "-",
             guarantor: parties.guarantor || "-",
             benchmark: interest.benchmark || "-",
             status: doc.status,
@@ -336,7 +336,7 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
                       "Borrower",
                       "Lender",
                       // "Facility Agent",
-                      "Arranger",
+                      // "Arranger",
                       "Guarantor",
                       "Benchmark",
                       "Actions",
@@ -363,7 +363,7 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
                         <td className="px-4 py-3">{doc.borrower}</td>
                         <td className="px-4 py-3">{doc.lender}</td>
                         {/* <td className="px-4 py-3">{doc.facilityAgent}</td> */}
-                        <td className="px-4 py-3">{doc.arranger}</td>
+                        {/* <td className="px-4 py-3">{doc.arranger}</td> */}
                         <td className="px-4 py-3">{doc.guarantor}</td>
                         <td className="px-4 py-3">
                           <Badge variant="info">{doc.benchmark}</Badge>

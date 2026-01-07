@@ -55,7 +55,7 @@ export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
             borrower: parties.borrower || "-",
             lender: parties.lenders[0] || "-",
             // facilityAgent: parties.facilityAgent || "-",
-            arranger: parties.arranger || "-",
+            // arranger: parties.arranger || "-",
             guarantor: parties.guarantor || "-",
 
             // facilityId: facility[0]?.facilityId || "-",
@@ -164,7 +164,7 @@ export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
                       "Borrower",
                       "Lender",
                       // "Facility Agent",
-                      "arranger",
+                      // "arranger",
                       "guarantor",
                       "Benchmark",
                       "Actions",
@@ -200,7 +200,7 @@ export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
                       <td className="px-4 py-3">{doc.borrower}</td>
                       <td className="px-4 py-3">{doc.lender}</td>
                       {/* <td className="px-4 py-3">{doc.facilityAgent}</td> */}
-                      <td className="px-4 py-3">{doc.arranger}</td>
+                      {/* <td className="px-4 py-3">{doc.arranger}</td> */}
                       <td className="px-4 py-3">{doc.guarantor}</td>
                       <td className="px-4 py-3">
                         <Badge variant="info">{doc.benchmark}</Badge>

@@ -125,7 +125,7 @@ export default function Settings({ setCurrentScreen }) {
             </CardContent>
           </Card>
 
-          <Card>
+          {/* <Card>
             <CardHeader>
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center">
@@ -170,7 +170,7 @@ export default function Settings({ setCurrentScreen }) {
                 </label>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         <div className="space-y-6">
@@ -186,18 +186,18 @@ export default function Settings({ setCurrentScreen }) {
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              <label className="flex items-center space-x-3">
+              {/* <label className="flex items-center space-x-3">
                 <input type="checkbox" defaultChecked className="rounded border-gray-300" />
                 <span className="text-sm text-gray-700">Email notifications</span>
-              </label>
+              </label> */}
               <label className="flex items-center space-x-3">
                 <input type="checkbox" defaultChecked className="rounded border-gray-300" />
                 <span className="text-sm text-gray-700">In-app notifications</span>
               </label>
-              <label className="flex items-center space-x-3">
+              {/* <label className="flex items-center space-x-3">
                 <input type="checkbox" className="rounded border-gray-300" />
                 <span className="text-sm text-gray-700">SMS alerts</span>
-              </label>
+              </label> */}
               <label className="flex items-center space-x-3">
                 <input type="checkbox" className="rounded border-gray-300" />
                 <span className="text-sm text-gray-700">Weekly digest</span>
@@ -223,9 +223,9 @@ export default function Settings({ setCurrentScreen }) {
                 </label>
                 <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option>English (US)</option>
-                  <option>English (UK)</option>
+                  {/* <option>English (UK)</option>
                   <option>French</option>
-                  <option>German</option>
+                  <option>German</option> */}
                 </select>
               </div>
               <div>
@@ -233,10 +233,10 @@ export default function Settings({ setCurrentScreen }) {
                   Timezone
                 </label>
                 <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option>UTC-5 (EST)</option>
-                  <option>UTC-8 (PST)</option>
+                  {/* <option>UTC-5 (EST)</option>
+                  <option>UTC-8 (PST)</option> */}
                   <option>UTC+0 (GMT)</option>
-                  <option>UTC+1 (CET)</option>
+                  {/* <option>UTC+1 (CET)</option> */}
                 </select>
               </div>
               <div>
@@ -245,14 +245,14 @@ export default function Settings({ setCurrentScreen }) {
                 </label>
                 <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option>USD ($)</option>
-                  <option>EUR (€)</option>
-                  <option>GBP (£)</option>
+                  {/* <option>EUR (€)</option>
+                  <option>GBP (£)</option> */}
                 </select>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          {/* <Card>
             <CardHeader>
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
@@ -280,7 +280,7 @@ export default function Settings({ setCurrentScreen }) {
                 Privacy Policy
               </Button>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </div>
     </div>

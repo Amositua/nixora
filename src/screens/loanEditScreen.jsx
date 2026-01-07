@@ -21,11 +21,15 @@ import {
   TrendingUp,
   FileCheck,
   RefreshCw,
+  ArrowRight,
+  Upload,
 } from "lucide-react";
 
 import { CollaborationInviteButton } from "../components/CollaborateButton.jsx";
 
-export default function LoanDocumentEditor({ loanId, setCurrentScreen }) {
+import { MessageSquare } from "lucide-react";
+
+export default function LoanDocumentEditor({ loanId, setCurrentScreen, setSelectedLoanId }) {
   const [loan, setLoan] = useState(null);
   const [loading, setLoading] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false)
@@ -59,9 +63,11 @@ export default function LoanDocumentEditor({ loanId, setCurrentScreen }) {
     const CACHE_KEY = `loanDetail:${userId}:${loanId}`;
 
     const cached = localStorage.getItem(CACHE_KEY);
+    // console.log("edit cached:", cached)
     if (cached) {
       setLoan(JSON.parse(cached));
       setLoading(false);
+      return;
     }
     setLoading(true);
     setError(null);
@@ -79,7 +85,7 @@ export default function LoanDocumentEditor({ loanId, setCurrentScreen }) {
 
       const data = await res.json();
       setLoan(data);
-        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+      localStorage.setItem(CACHE_KEY, JSON.stringify(data));
     } catch (err) {
       setError(err.message);
       console.error("Failed to fetch loan details:", err);
@@ -399,6 +405,21 @@ export default function LoanDocumentEditor({ loanId, setCurrentScreen }) {
           </Button>
         </div>
       </div>
+      
+      <div className="flex items-center gap-3">
+  <Button
+    variant="outline"
+    onClick={() => {
+      setSelectedLoanId(loanId);
+      setCurrentScreen("loan-chat");
+    }}
+  >
+    <MessageSquare className="w-4 h-4 mr-2" />
+    Ask AI
+  </Button>
+  
+  {/* Other existing buttons */}
+</div>
 
       {/* Success Message */}
       {success && (
@@ -470,159 +491,409 @@ export default function LoanDocumentEditor({ loanId, setCurrentScreen }) {
 
       {/* Parties Section */}
       <Section title="Parties" icon={Users} section="parties">
-        <div className="space-y-2">
-          <EditableField
-            label="Borrower"
-            path="parties.borrower"
-            value={loan.loanData?.parties?.borrower}
-          />
-          <EditableField
-            label="Parent"
-            path="parties.parent"
-            value={loan.loanData?.parties?.parent}
-          />
-          <EditableField
-            label="Guarantor"
-            path="parties.guarantor"
-            value={loan.loanData?.parties?.guarantor}
-          />
-          <EditableField
-            label="Facility Agent"
-            path="parties.facilityAgent"
-            value={loan.loanData?.parties?.facilityAgent}
-          />
-          <EditableField
-            label="Security Agent"
-            path="parties.securityAgent"
-            value={loan.loanData?.parties?.securityAgent}
-          />
-          <EditableField
-            label="Arranger"
-            path="parties.arranger"
-            value={loan.loanData?.parties?.arranger}
-          />
-          <EditableField
-            label="Bookrunner"
-            path="parties.bookrunner"
-            value={loan.loanData?.parties?.bookrunner}
-          />
-          <ArrayField
-            label="Lenders"
-            path="parties.lenders"
-            items={loan.loanData?.parties?.lenders}
-          />
-        </div>
-      </Section>
+  <div className="space-y-2">
+    <EditableField
+      label="Borrower"
+      path="parties.borrower"
+      value={loan.loanData?.parties?.borrower}
+    />
+    <EditableField
+      label="Parent"
+      path="parties.parent"
+      value={loan.loanData?.parties?.parent}
+    />
+    <EditableField
+      label="Guarantor"
+      path="parties.guarantor"
+      value={loan.loanData?.parties?.guarantor}
+    />
+    {/* <ArrayField
+      label="Obligors"
+      path="parties.obligors"
+      items={loan.loanData?.parties?.obligors}
+    /> */}
+    
+    {/* <ArrayField
+      label="Original Lenders"
+      path="parties.originalLenders"
+      items={loan.loanData?.parties?.originalLenders}
+    />
+    <ArrayField
+      label="Finance Parties"
+      path="parties.financeParties"
+      items={loan.loanData?.parties?.financeParties}
+    /> */}
+    <EditableField
+      label="Facility Agent"
+      path="parties.facilityAgent"
+      value={loan.loanData?.parties?.facilityAgent}
+    />
+    <EditableField
+      label="Security Agent"
+      path="parties.securityAgent"
+      value={loan.loanData?.parties?.securityAgent}
+    />
+    <EditableField
+      label="Arranger"
+      path="parties.arranger"
+      value={loan.loanData?.parties?.arranger}
+    />
+    <EditableField
+      label="Bookrunner"
+      path="parties.bookrunner"
+      value={loan.loanData?.parties?.bookrunner}
+    />
+    <ArrayField
+      label="Lenders"
+      path="parties.lenders"
+      items={loan.loanData?.parties?.lenders}
+    />
+  </div>
+</Section>
+
 
       {/* Facility Section */}
       <Section title="Facility Details" icon={FileCheck} section="facility">
-        <div className="space-y-2">
-          <EditableField
-            label="Facility Type"
-            path="facility.facilityType"
-            value={loan.loanData?.facility?.facilityType}
-          />
-          <EditableField
-            label="Facility Name"
-            path="facility.facilityName"
-            value={loan.loanData?.facility?.facilityName}
-          />
-          <EditableField
-            label="Currency"
-            path="facility.currency"
-            value={loan.loanData?.facility?.currency}
-          />
-          <EditableField
-            label="Facility Amount"
-            path="facility.facilityAmount"
-            value={loan.loanData?.facility?.facilityAmount}
-          />
-          <EditableField
-            label="Availability Period"
-            path="facility.availabilityPeriod"
-            value={loan.loanData?.facility?.availabilityPeriod}
-            multiline
-          />
-          <EditableField
-            label="Final Maturity Date"
-            path="facility.finalMaturityDate"
-            value={loan.loanData?.facility?.finalMaturityDate}
-          />
-          <EditableField
-            label="Repayment Profile"
-            path="facility.repaymentProfile"
-            value={loan.loanData?.facility?.repaymentProfile}
-          />
-        </div>
-      </Section>
+  <div className="space-y-2">
+    <EditableField
+      label="Facility ID"
+      path="facility.facilityId"
+      value={loan.loanData?.facility?.facilityId}
+    />
+    <EditableField
+      label="Facility Type"
+      path="facility.facilityType"
+      value={loan.loanData?.facility?.facilityType}
+    />
+    <EditableField
+      label="Facility Name"
+      path="facility.facilityName"
+      value={loan.loanData?.facility?.facilityName}
+    />
+    <EditableField
+      label="Currency"
+      path="facility.currency"
+      value={loan.loanData?.facility?.currency}
+    />
+    <EditableField
+      label="Facility Amount"
+      path="facility.facilityAmount"
+      value={loan.loanData?.facility?.facilityAmount}
+    />
+    <EditableField
+      label="Commitment"
+      path="facility.commitment"
+      value={loan.loanData?.facility?.commitment}
+    />
+    <EditableField
+      label="Availability Period"
+      path="facility.availabilityPeriod"
+      value={loan.loanData?.facility?.availabilityPeriod}
+      multiline
+    />
+    <EditableField
+      label="Drawstop"
+      path="facility.drawstop"
+      value={loan.loanData?.facility?.drawstop}
+    />
+    <EditableField
+      label="Final Maturity Date"
+      path="facility.finalMaturityDate"
+      value={loan.loanData?.facility?.finalMaturityDate}
+    />
+    <EditableField
+      label="Repayment Profile"
+      path="facility.repaymentProfile"
+      value={loan.loanData?.facility?.repaymentProfile}
+    />
+    <EditableField
+      label="Purpose"
+      path="facility.purpose"
+      value={loan.loanData?.facility?.purpose}
+      multiline
+    />
+  </div>
+</Section>
+
 
       {/* Interest Section */}
       <Section title="Interest & Pricing" icon={TrendingUp} section="interest">
-        <div className="space-y-2">
-          <EditableField
-            label="Benchmark"
-            path="interest.benchmark"
-            value={loan.loanData?.interest?.benchmark}
-          />
-          <EditableField
-            label="Margin"
-            path="interest.margin"
-            value={loan.loanData?.interest?.margin}
-          />
-          <EditableField
-            label="Interest Period"
-            path="interest.interestPeriod"
-            value={loan.loanData?.interest?.interestPeriod}
-          />
-          <EditableField
-            label="Interest Payment Date"
-            path="interest.interestPaymentDate"
-            value={loan.loanData?.interest?.interestPaymentDate}
-          />
-          <EditableField
-            label="Default Interest"
-            path="interest.defaultInterest"
-            value={loan.loanData?.interest?.defaultInterest}
-            multiline
-          />
-          <EditableField
-            label="Day Count Fraction"
-            path="interest.dayCountFraction"
-            value={loan.loanData?.interest?.dayCountFraction}
-          />
-        </div>
-      </Section>
+  <div className="space-y-2">
+    <EditableField
+      label="Benchmark"
+      path="interest.benchmark"
+      value={loan.loanData?.interest?.benchmark}
+    />
+    <EditableField
+      label="Margin"
+      path="interest.margin"
+      value={loan.loanData?.interest?.margin}
+    />
+    <EditableField
+      label="Credit Adjustment Spread"
+      path="interest.creditAdjustmentSpread"
+      value={loan.loanData?.interest?.creditAdjustmentSpread}
+    />
+    <EditableField
+      label="Interest Period"
+      path="interest.interestPeriod"
+      value={loan.loanData?.interest?.interestPeriod}
+    />
+    <EditableField
+      label="Interest Payment Date"
+      path="interest.interestPaymentDate"
+      value={loan.loanData?.interest?.interestPaymentDate}
+    />
+    <EditableField
+      label="Break Costs"
+      path="interest.breakCosts"
+      value={loan.loanData?.interest?.breakCosts}
+    />
+    <EditableField
+      label="Default Interest"
+      path="interest.defaultInterest"
+      value={loan.loanData?.interest?.defaultInterest}
+      multiline
+    />
+    <EditableField
+      label="Day Count Fraction"
+      path="interest.dayCountFraction"
+      value={loan.loanData?.interest?.dayCountFraction}
+    />
+    <EditableField
+      label="Compounding Method"
+      path="interest.compoundingMethod"
+      value={loan.loanData?.interest?.compoundingMethod}
+    />
+    <EditableField
+      label="Rollover"
+      path="interest.rollover"
+      value={loan.loanData?.interest?.rollover}
+    />
+  </div>
+</Section>
+
 
       {/* Fees Section */}
       <Section title="Fees" icon={DollarSign} section="fees">
-        <div className="space-y-2">
-          <EditableField
-            label="Arrangement Fee"
-            path="fees.arrangementFee"
-            value={loan.loanData?.fees?.arrangementFee}
-          />
-          <EditableField
-            label="Commitment Fee"
-            path="fees.commitmentFee"
-            value={loan.loanData?.fees?.commitmentFee}
-          />
-          <EditableField
-            label="Utilisation Fee"
-            path="fees.utilisationFee"
-            value={loan.loanData?.fees?.utilisationFee}
-          />
-          <EditableField
-            label="Agency Fee"
-            path="fees.agencyFee"
-            value={loan.loanData?.fees?.agencyFee}
-          />
-          <EditableField
-            label="Cancellation Fee"
-            path="fees.cancellationFee"
-            value={loan.loanData?.fees?.cancellationFee}
-          />
-        </div>
-      </Section>
+  <div className="space-y-2">
+    <EditableField
+      label="Arrangement Fee"
+      path="fees.arrangementFee"
+      value={loan.loanData?.fees?.arrangementFee}
+    />
+    <EditableField
+      label="Participation Fee"
+      path="fees.participationFee"
+      value={loan.loanData?.fees?.participationFee}
+    />
+    <EditableField
+      label="Commitment Fee"
+      path="fees.commitmentFee"
+      value={loan.loanData?.fees?.commitmentFee}
+    />
+    <EditableField
+      label="Utilisation Fee"
+      path="fees.utilisationFee"
+      value={loan.loanData?.fees?.utilisationFee}
+    />
+    <EditableField
+      label="Agency Fee"
+      path="fees.agencyFee"
+      value={loan.loanData?.fees?.agencyFee}
+    />
+    <EditableField
+      label="Cancellation Fee"
+      path="fees.cancellationFee"
+      value={loan.loanData?.fees?.cancellationFee}
+    />
+    <EditableField
+      label="Front End Fee"
+      path="fees.frontEndFee"
+      value={loan.loanData?.fees?.frontEndFee}
+    />
+  </div>
+</Section>
+
+
+      <Section title="Repayment" icon={Calendar} section="repayment">
+  <div className="space-y-2">
+    <EditableField label="Repayment Date" path="repayment.repaymentDate" value={loan.loanData?.repayment?.repaymentDate} />
+    <EditableField label="Repayment Instalments" path="repayment.repaymentInstalments" value={loan.loanData?.repayment?.repaymentInstalments} />
+    <EditableField label="Amortisation Schedule" path="repayment.amortisationSchedule" value={loan.loanData?.repayment?.amortisationSchedule} />
+    <EditableField label="Balloon Payment" path="repayment.balloonPayment" value={loan.loanData?.repayment?.balloonPayment} />
+    <EditableField label="Voluntary Prepayment" path="repayment.voluntaryPrepayment" value={loan.loanData?.repayment?.voluntaryPrepayment} />
+    <EditableField label="Mandatory Prepayment" path="repayment.mandatoryPrepayment" value={loan.loanData?.repayment?.mandatoryPrepayment} />
+    <EditableField label="Change of Control Prepayment" path="repayment.changeOfControlPrepayment" value={loan.loanData?.repayment?.changeOfControlPrepayment} />
+    <EditableField label="Illegality Prepayment" path="repayment.illegalityPrepayment" value={loan.loanData?.repayment?.illegalityPrepayment} />
+    <EditableField label="Tax Gross Up Prepayment" path="repayment.taxGrossUpPrepayment" value={loan.loanData?.repayment?.taxGrossUpPrepayment} />
+  </div>
+</Section>
+
+
+<Section title="Prepayment" icon={TrendingUp} section="prepayment">
+  <div className="space-y-2">
+    <EditableField label="Prepayment Type" path="prepayment.prepaymentType" value={loan.loanData?.prepayment?.prepaymentType} />
+    <EditableField label="Voluntary" path="prepayment.voluntary" value={loan.loanData?.prepayment?.voluntary} />
+    <EditableField label="Asset Sale" path="prepayment.assetSale" value={loan.loanData?.prepayment?.assetSale} />
+    <EditableField label="Insurance Proceeds" path="prepayment.insuranceProceeds" value={loan.loanData?.prepayment?.insuranceProceeds} />
+    <EditableField label="Debt Issuance" path="prepayment.debtIssuance" value={loan.loanData?.prepayment?.debtIssuance} />
+    <EditableField label="Change of Control" path="prepayment.changeOfControl" value={loan.loanData?.prepayment?.changeOfControl} />
+    <EditableField label="Illegality" path="prepayment.illegality" value={loan.loanData?.prepayment?.illegality} />
+    <EditableField label="Tax" path="prepayment.tax" value={loan.loanData?.prepayment?.tax} />
+    <EditableField label="Break Costs" path="prepayment.breakCosts" value={loan.loanData?.prepayment?.breakCosts} />
+    <EditableField label="Prepayment Fee" path="prepayment.prepaymentFee" value={loan.loanData?.prepayment?.prepaymentFee} />
+  </div>
+</Section>
+
+
+<Section title="Utilisation" icon={Upload} section="utilisation">
+  <div className="space-y-2">
+    <EditableField label="Utilisation Request" path="utilisation.utilisationRequest" value={loan.loanData?.utilisation?.utilisationRequest} />
+    <EditableField label="Utilisation Date" path="utilisation.utilisationDate" value={loan.loanData?.utilisation?.utilisationDate} />
+    <EditableField label="Utilisation Amount" path="utilisation.utilisationAmount" value={loan.loanData?.utilisation?.utilisationAmount} />
+    <EditableField label="Utilisation Currency" path="utilisation.utilisationCurrency" value={loan.loanData?.utilisation?.utilisationCurrency} />
+    <EditableField label="Utilisation Notice" path="utilisation.utilisationNotice" value={loan.loanData?.utilisation?.utilisationNotice} />
+    <EditableField label="Minimum Amount" path="utilisation.minimumAmount" value={loan.loanData?.utilisation?.minimumAmount} />
+    <EditableField label="Multiple Drawings" path="utilisation.multipleDrawings" value={loan.loanData?.utilisation?.multipleDrawings} />
+    <EditableField label="Cancelled Commitments" path="utilisation.cancelledCommitments" value={loan.loanData?.utilisation?.cancelledCommitments} />
+  </div>
+</Section>
+
+<Section title="Covenants" icon={Shield} section="covenants">
+  <div className="space-y-2">
+    <ArrayField
+      label="Financial"
+      path="covenants.financial"
+      items={loan.loanData?.covenants?.financial}
+    />
+    <ArrayField
+      label="Information"
+      path="covenants.information"
+      items={loan.loanData?.covenants?.information}
+    />
+    <ArrayField
+      label="General"
+      path="covenants.general"
+      items={loan.loanData?.covenants?.general}
+    />
+    <ArrayField
+      label="Negative Pledge"
+      path="covenants.negativePledge"
+      items={loan.loanData?.covenants?.negativePledge}
+    />
+    <ArrayField
+      label="Disposals"
+      path="covenants.disposals"
+      items={loan.loanData?.covenants?.disposals}
+    />
+    <ArrayField
+      label="Mergers"
+      path="covenants.mergers"
+      items={loan.loanData?.covenants?.mergers}
+    />
+    <ArrayField
+      label="Change Of Business"
+      path="covenants.changeOfBusiness"
+      items={loan.loanData?.covenants?.changeOfBusiness}
+    />
+    <ArrayField
+      label="Indebtedness"
+      path="covenants.indebtedness"
+      items={loan.loanData?.covenants?.indebtedness}
+    />
+    <ArrayField
+      label="Guarantees"
+      path="covenants.guarantees"
+      items={loan.loanData?.covenants?.guarantees}
+    />
+  </div>
+</Section>
+
+
+<Section title="Events of Default" icon={AlertCircle} section="eventsOfDefault">
+  <div className="space-y-2">
+    <ArrayField
+      label="Non Payment"
+      path="eventsOfDefault.nonPayment"
+      items={loan.loanData?.eventsOfDefault?.nonPayment}
+    />
+    <ArrayField
+      label="Financial Covenant Breach"
+      path="eventsOfDefault.financialCovenantBreach"
+      items={loan.loanData?.eventsOfDefault?.financialCovenantBreach}
+    />
+    <ArrayField
+      label="Other Obligation Breach"
+      path="eventsOfDefault.otherObligationBreach"
+      items={loan.loanData?.eventsOfDefault?.otherObligationBreach}
+    />
+    <ArrayField
+      label="Misrepresentation"
+      path="eventsOfDefault.misrepresentation"
+      items={loan.loanData?.eventsOfDefault?.misrepresentation}
+    />
+    <ArrayField
+      label="Cross Default"
+      path="eventsOfDefault.crossDefault"
+      items={loan.loanData?.eventsOfDefault?.crossDefault}
+    />
+    <ArrayField
+      label="Insolvency"
+      path="eventsOfDefault.insolvency"
+      items={loan.loanData?.eventsOfDefault?.insolvency}
+    />
+    <ArrayField
+      label="Creditors Process"
+      path="eventsOfDefault.creditorsProcess"
+      items={loan.loanData?.eventsOfDefault?.creditorsProcess}
+    />
+    <ArrayField
+      label="Unlawfulness"
+      path="eventsOfDefault.unlawfulness"
+      items={loan.loanData?.eventsOfDefault?.unlawfulness}
+    />
+    <ArrayField
+      label="Change Of Control"
+      path="eventsOfDefault.changeOfControl"
+      items={loan.loanData?.eventsOfDefault?.changeOfControl}
+    />
+    <ArrayField
+      label="Repudiation"
+      path="eventsOfDefault.repudiation"
+      items={loan.loanData?.eventsOfDefault?.repudiation}
+    />
+    <ArrayField
+      label="Audit Qualification"
+      path="eventsOfDefault.auditQualification"
+      items={loan.loanData?.eventsOfDefault?.auditQualification}
+    />
+  </div>
+</Section>
+
+<Section title="Representations" icon={FileText} section="representations">
+  <div className="space-y-2">
+    <EditableField
+      label="Representations"
+      path="representations"
+      value={loan.loanData?.representations || "N/A"}
+      multiline
+    />
+  </div>
+</Section>
+
+<Section title="Transfers" icon={ArrowRight} section="transfers">
+  <div className="space-y-2">
+    <EditableField
+      label="Transfers"
+      path="transfers"
+      value={loan.loanData?.transfers || "N/A"}
+      multiline
+    />
+  </div>
+</Section>
+
+
 
       {/* Governing Law Section */}
       <Section title="Governing Law" icon={Shield} section="governingLaw">

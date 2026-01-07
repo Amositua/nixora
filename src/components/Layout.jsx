@@ -11,6 +11,9 @@ import {
   ChevronDown,
   Menu,
   LogOut,
+  BarChart3,
+  MessageCircle,
+  Edit3,
 } from "lucide-react";
 import Logo from "../../assets/sa.jpeg";
 
@@ -38,11 +41,12 @@ export default function Layout({
     { id: "upload", label: "Upload Loans", icon: Upload },
     { id: "portfolio", label: "Loan Portfolio", icon: FolderOpen },
     { id: "query", label: "Search & Queries", icon: Search },
-    { id: "compare-loans", label: "Compare Loans", icon: FileText },
+    { id: "compare-loans", label: "Compare Loans", icon: BarChart3 },
     { id: "reports", label: "Reports", icon: FileText },
     { id: "timeline", label: "Loan Timelines", icon: Calendar },
+    { id: "loan-chat", label: "Ask AI", icon: MessageCircle },
     // { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "collaborate", label: "collaborate and Edit", icon: FileText},
+    { id: "collaborate", label: "collaborate and Edit", icon: Edit3 },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
@@ -52,7 +56,7 @@ export default function Layout({
         <div className="h-16 flex items-center px-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
             {/* <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-teal-500 rounded-lg flex items-center justify-center"> */}
-              {/* <FileText className="w-5 h-5 text-white" /> */}
+            {/* <FileText className="w-5 h-5 text-white" /> */}
             {/* </div> */}
             <img src={Logo} alt="Logo" className="w-8 h-8 rounded-lg" />
             <span className="text-lg font-semibold text-gray-900">Nixora</span>
@@ -122,7 +126,7 @@ export default function Layout({
             <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden z-50">
               <button
                 onClick={() => {
-                  if (currentScreen === "settings"){
+                  if (currentScreen === "settings") {
                     setCurrentScreen("dashboard");
                   }
                   setCurrentScreen("settings");
@@ -157,19 +161,37 @@ export default function Layout({
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
+                onClick={() => setCurrentScreen("query")}
                 type="text"
                 placeholder="Search loans, borrowers, documents..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+              {/* <div className="flex-1">
+                <h2 className="text-2xl font-bold text-blue-500">
+                  Welcome back
+                  {user ? `, ${JSON.parse(user).name.split(" ")[0]}` : ""}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {new Date().toLocaleDateString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              </div> */}
             </div>
           </div>
 
           <div className="flex items-center space-x-4">
-            <button onClick={() => {
+            <button
+              onClick={() => {
                 setCurrentScreen("notifications");
-              }} className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Bell className="w-5 h-5 text-gray-600" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              }}
+              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              {/* <Bell className="w-5 h-5 text-gray-600" /> */}
+              {/* <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span> */}
             </button>
             <button
               onClick={() => {

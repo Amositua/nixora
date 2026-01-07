@@ -356,7 +356,12 @@ export default function Upload({ setCurrentScreen, setSelectedLoanId }) {
                     return (
                       <tr
                         key={doc.id}
-                        className="hover:bg-gray-50"
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedLoanId(doc.id);
+                              setCurrentScreen("loan-details");
+                            }}
                       >
 
                         <td className="px-4 py-3">{doc.document_name}</td>

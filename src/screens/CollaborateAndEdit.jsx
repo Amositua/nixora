@@ -24,6 +24,14 @@ export default function CollaborateAndEdit({ setCurrentScreen, setSelectedLoanId
   }, []);
 
   const fetchLoans = async () => {
+     const user = localStorage.getItem("user");
+    const userId = user ? JSON.parse(user).userId : "guest";
+    const cachedLoans = localStorage.getItem(`loanDocuments_collaborate:${userId}`);
+
+    if (cachedLoans) {
+      setLoans(JSON.parse(cachedLoans));
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -40,6 +48,10 @@ export default function CollaborateAndEdit({ setCurrentScreen, setSelectedLoanId
 
       const data = await res.json();
       setLoans(data || []);
+      const user = localStorage.getItem("user");
+        const userId = user ? JSON.parse(user).userId : "guest";
+        const STORAGE_KEY = `loanDocuments_collaborate:${userId}`;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (err) {
       setError(err.message);
       console.error("Failed to fetch loans:", err);
@@ -186,10 +198,10 @@ export default function CollaborateAndEdit({ setCurrentScreen, setSelectedLoanId
           {filteredLoans.map((loan) => (
             <Card
               key={loan.loanId}
-              className="hover:shadow-lg transition-shadow"
+              className="h-[320px]  hover:shadow-lg transition-shadow"
             >
-              <CardContent className="p-6">
-                <div className="space-y-4">
+              <CardContent className="p-6 h-full">
+                <div className="flex flex-col h-full">
                   {/* Header */}
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -260,7 +272,7 @@ export default function CollaborateAndEdit({ setCurrentScreen, setSelectedLoanId
                   {/* Edit Button */}
                   <Button
                     variant="primary"
-                    className="w-full"
+                    className="w-full mt-auto"
                     onClick={() => handleEditLoan(loan.loanId)}
                   >
                     <Edit2 className="w-4 h-4 mr-2" />

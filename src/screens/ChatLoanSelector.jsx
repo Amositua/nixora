@@ -15,7 +15,10 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-export default function ChatLoanSelector({ setCurrentScreen, setSelectedLoanId }) {
+export default function ChatLoanSelector({
+  setCurrentScreen,
+  setSelectedLoanId,
+}) {
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -51,9 +54,9 @@ export default function ChatLoanSelector({ setCurrentScreen, setSelectedLoanId }
       const data = await res.json();
       setLoans(data || []);
       const user = localStorage.getItem("user");
-        const userId = user ? JSON.parse(user).userId : "guest";
-        const STORAGE_KEY = `loanDocuments_chat:${userId}`;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      const userId = user ? JSON.parse(user).userId : "guest";
+      const STORAGE_KEY = `loanDocuments_chat:${userId}`;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (err) {
       setError(err.message);
       console.error("Failed to fetch loans:", err);
@@ -63,7 +66,7 @@ export default function ChatLoanSelector({ setCurrentScreen, setSelectedLoanId }
   };
 
   const handleSelectLoan = (loanId) => {
-    console.log("ddd:",loanId)
+    // console.log("ddd:",loanId)
     setSelectedLoanId(loanId);
     setCurrentScreen("loan-chat");
   };
@@ -94,7 +97,7 @@ export default function ChatLoanSelector({ setCurrentScreen, setSelectedLoanId }
         <div>
           <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
             {/* <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg"> */}
-              {/* <MessageSquare className="w-6 h-6 text-white" /> */}
+            {/* <MessageSquare className="w-6 h-6 text-white" /> */}
             {/* </div> */}
             AI Document Chat
           </h1>
@@ -119,9 +122,10 @@ export default function ChatLoanSelector({ setCurrentScreen, setSelectedLoanId }
                 AI-Powered Document Assistant
               </h3>
               <p className="text-sm text-gray-700 mb-3">
-                Get instant answers about your loan documents. Ask about interest rates, 
-                repayment terms, covenants, parties involved, or any other details. 
-                Our AI assistant analyzes the document to provide accurate responses.
+                Get instant answers about your loan documents. Ask about
+                interest rates, repayment terms, covenants, parties involved, or
+                any other details. Our AI assistant analyzes the document to
+                provide accurate responses.
               </p>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="info" className="text-xs">
@@ -224,12 +228,12 @@ export default function ChatLoanSelector({ setCurrentScreen, setSelectedLoanId }
             <Card
               key={loan.loanId}
               className="hover:shadow-lg transition-all hover:border-blue-100 group"
-            //   onClick={() => handleSelectLoan(loan.loanId)}
+              //   onClick={() => handleSelectLoan(loan.loanId)}
             >
               <CardContent className="p-6">
-                <div className="space-y-4">
+                <div className="space-y-4 flex flex-col h-[280px]">
                   {/* Header */}
-                  <div className="flex items-start justify-between">
+                  <div className="h-[20%] flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1 group-hover:text-blue-600 transition-colors">
                         {loan.loanData?.parties?.borrower || "Unknown Borrower"}
@@ -248,7 +252,7 @@ export default function ChatLoanSelector({ setCurrentScreen, setSelectedLoanId }
                   </div>
 
                   {/* Quick Info */}
-                  <div className="space-y-2 pt-2 border-t border-gray-100">
+                  <div className="h-[30%] space-y-2 pt-2 border-t border-gray-100">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Facility Type</span>
                       <span className="font-medium text-gray-900 text-right line-clamp-1">
@@ -273,7 +277,7 @@ export default function ChatLoanSelector({ setCurrentScreen, setSelectedLoanId }
                   </div>
 
                   {/* Chat Button */}
-                  <div className="pt-2">
+                  <div className="pt-2 h-[25%]">
                     <Button
                       variant="primary"
                       className="w-full "
@@ -288,7 +292,7 @@ export default function ChatLoanSelector({ setCurrentScreen, setSelectedLoanId }
                   </div>
 
                   {/* Sample Questions Preview */}
-                  <div className="pt-2 border-t border-gray-100">
+                  <div className="h-[25%] pt-2 border-t border-gray-100">
                     <p className="text-xs font-medium text-gray-500 mb-1.5">
                       Ask about:
                     </p>

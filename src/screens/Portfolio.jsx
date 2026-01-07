@@ -187,11 +187,12 @@ export default function Portfolio({ setCurrentScreen, setSelectedLoanId }) {
                     <tr
                       key={doc.id}
                       onMouseEnter={() => prefetchLoanDetails(doc.id)} // 👈 PREFETCH
-                      // onClick={() => {
-                      //   setSelectedLoanId(doc.id);
-                      //   setCurrentScreen("loan-details");
-                      // }}
-                      className="hover:bg-gray-50"
+                      onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedLoanId(doc.id);
+                              setCurrentScreen("loan-details");
+                            }}
+                      className="hover:bg-gray-50 cursor-pointer"
                     >
                       {/* <td className="px-4 py-3 text-sm font-mono text-gray-700">
                         {doc.id.slice(0, 8)}…

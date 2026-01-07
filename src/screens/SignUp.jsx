@@ -11,6 +11,8 @@ import {
 import Button from "../components/ui/Button";
 import { authService } from "../services/authServices";
 
+import Logo from "../../assets/sa.jpeg"
+
 export default function SignUp({ setCurrentScreen }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -87,7 +89,8 @@ export default function SignUp({ setCurrentScreen }) {
         <div className="bg-white rounded-2xl border border-gray-200 shadow-xl p-8">
           <div className="flex items-center justify-center mb-8">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-white" />
+            <img src={Logo} alt="Logo" className="w-8 h-8 rounded-lg" />
+
             </div>
           </div>
 

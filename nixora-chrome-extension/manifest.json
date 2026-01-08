@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Nixora Loan Dashboard",
+  "version": "1.0.0",
+  "action": { "default_popup": "index.html" },
+  "permissions": ["storage", "notifications"],
+  "host_permissions": ["https://nixora-image-latest.onrender.com/*"],
+  "background": {
+  "service_worker": "src/background.ts",
+  "type": "module"
+},
+"content_security_policy": {
+  "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://nixora-image-latest.onrender.com https://*.googleapis.com;"
+}
+}

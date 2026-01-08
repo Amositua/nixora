@@ -1,0 +1,150 @@
+import { useState, useEffect } from "react";
+import Layout from "./components/Layout";
+import Dashboard from "./screens/Dashboard";
+import Upload from "./screens/Upload";
+import LoanReview from "./screens/LoanReview";
+import Portfolio from "./screens/Portfolio";
+import LoanComparison from "./screens/LoanCompare";
+import QueryBuilder from "./screens/QueryBuilder";
+import Reports from "./screens/Reports";
+import Timeline from "./screens/Timeline";
+import Notifications from "./screens/Notifications";
+import Settings from "./screens/Settings";
+import Landing from "./screens/Landing";
+import SignIn from "./screens/SignIn";
+import SignUp from "./screens/SignUp";
+import { authService } from "./services/authServices";
+
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+
+
+import LoanDetails from "./screens/LoanDetails"
+
+function App() {
+  const [currentScreen, setCurrentScreen] = useState("landing");
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [selectedLoanId, setSelectedLoanId] = useState(null);
+
+  useEffect(() => {
+    const session = authService.getSession();
+
+    if (session) {
+      setSession(session);
+      setCurrentScreen("dashboard");
+    }
+
+    console.log("Auth session checkeddddd:", session);
+    // console.log("Current Screen on load:", currentScreen);
+
+    setLoading(false);
+  }, []);
+
+  const handleSignOut = () => {
+    authService.logout();
+    setSession(null);
+    setCurrentScreen("landing");
+  };
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50">
+        <p className="text-gray-600 font-medium">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <>
+        {currentScreen === "landing" && (
+          <Landing setCurrentScreen={setCurrentScreen} />
+        )}
+        {currentScreen === "signin" && (
+          <SignIn
+            setCurrentScreen={setCurrentScreen}
+            onAuthSuccess={(session) => {
+              setSession(session);
+              setCurrentScreen("dashboard");
+            }}
+          />
+        )}
+        {currentScreen === "signup" && (
+          <SignUp setCurrentScreen={setCurrentScreen} />
+        )}
+      </>
+    );
+  }
+
+  console.log("currentScreen inside session:", currentScreen);
+  const user = localStorage.getItem("user");
+      const userId = user ? JSON.parse(user).userId : "guest";
+  const LoanData = localStorage.getItem(`loanDocuments:${userId}`);
+
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case "dashboard":
+        return <Dashboard />;
+      case "upload":
+        return (
+          <Upload
+            currentScreen={currentScreen}
+            setCurrentScreen={setCurrentScreen}
+            setSelectedLoanId={setSelectedLoanId}
+          />
+        );
+      case "review":
+        return <LoanReview />;
+      case "portfolio":
+        return (
+          <Portfolio
+            setCurrentScreen={setCurrentScreen}
+            setSelectedLoanId={setSelectedLoanId}
+          />
+        );
+      case "loan-details":
+        return (
+          <LoanDetails
+            loanId={selectedLoanId}
+            setCurrentScreen={setCurrentScreen}
+          />
+        );
+
+      case "query":
+        return <LoanComparison 
+        loanData={LoanData}
+        setCurrentScreen={setCurrentScreen}
+        // setSelectedLoanId={setSelectedLoanId}
+        />;
+      case "compare-loans":
+        return <LoanComparison 
+        setCurrentScreen={setCurrentScreen}
+        setSelectedLoanId={setSelectedLoanId}
+        mode="compare-loans"
+        />;
+      case "reports":
+        return <Reports />;
+      case "timeline":
+        return <Timeline />;
+      case "notifications":
+        return <Notifications />;
+      case "settings":
+        return <Settings />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
+  return (
+    <Layout
+      currentScreen={currentScreen}
+      setCurrentScreen={setCurrentScreen}
+      onSignOut={handleSignOut}
+    >
+      {renderScreen()}
+    </Layout>
+  );
+}
+
+export default App;
